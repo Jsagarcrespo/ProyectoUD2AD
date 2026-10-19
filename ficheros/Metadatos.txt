@@ -34,9 +34,9 @@ CLAVES PRIMARIAS:
 COLUMNAS:
 - id | Tipo: INTEGER | Tamaño: 10 | NOT NULL
 - id_partida | Tipo: INTEGER | Tamaño: 10 | NOT NULL
-- documento_socia | Tipo: VARCHAR | Tamaño: 20 | Puede ser NULL
-- nombre_invitada | Tipo: VARCHAR | Tamaño: 100 | Puede ser NULL
-- ganadora | Tipo: BOOLEAN | Tamaño: 1 | NOT NULL
+- documento_socio | Tipo: VARCHAR | Tamaño: 20 | Puede ser NULL
+- nombre_invitado | Tipo: VARCHAR | Tamaño: 100 | Puede ser NULL
+- ganador | Tipo: BOOLEAN | Tamaño: 1 | NOT NULL
 
 ---------------------------------
 TABLA: juegos
@@ -56,7 +56,7 @@ COLUMNAS:
 - tipo | Tipo: CHAR | Tamaño: 11 | NOT NULL
 - ubicacion | Tipo: VARCHAR | Tamaño: 100 | Puede ser NULL
 - estado | Tipo: CHAR | Tamaño: 10 | NOT NULL
-- documento_propietaria | Tipo: VARCHAR | Tamaño: 20 | Puede ser NULL
+- documento_propietario | Tipo: VARCHAR | Tamaño: 20 | Puede ser NULL
 - fecha_alta | Tipo: DATE | Tamaño: 10 | NOT NULL
 
 ---------------------------------

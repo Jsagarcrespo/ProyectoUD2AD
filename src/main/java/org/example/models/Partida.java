@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class Partida {
+
     private int id;
     private int idJuego;
     private LocalDate fecha;
@@ -12,6 +13,7 @@ public class Partida {
     private String estado;
 
     public Partida(int id, int idJuego, LocalDate fecha, LocalTime hora, int jugadoresDeseados, String estado) {
+
         this.id = id;
         this.idJuego = idJuego;
         this.fecha = fecha;
@@ -20,15 +22,24 @@ public class Partida {
         this.estado = estado;
     }
 
+    // Valida los datos de una partida
     public void validar(int min, int max) {
-        if (idJuego <= 0 || fecha == null || hora == null)
-            throw new IllegalArgumentException("Juego, fecha y hora son obligatorios.");
-        if (jugadoresDeseados < min || jugadoresDeseados > max)
-            throw new IllegalArgumentException("El numero de jugadoras debe estar entre " + min + " y " + max + ".");
-        if (!("programada".equals(estado) || "finalizada".equals(estado) || "cancelada".equals(estado)))
-            throw new IllegalArgumentException("Estado de partida incorrecto.");
+
+        if (idJuego <= 0 || fecha == null || hora == null) {
+            throw new IllegalArgumentException("Juego, fecha y hora son obligatorios");
+        }
+
+        if (jugadoresDeseados < min || jugadoresDeseados > max) {
+            throw new IllegalArgumentException("El numero de jugadores debe estar entre " + min + " y " + max);
+        }
+
+        if (!("programada".equals(estado) || "finalizada".equals(estado) || "cancelada".equals(estado))) {
+
+            throw new IllegalArgumentException("Estado de partida incorrecto");
+        }
     }
 
+    // Calcula las plazas disponibles
     public static int plazasLibres(int deseadas, int inscritas) {
         return Math.max(0, deseadas - inscritas);
     }

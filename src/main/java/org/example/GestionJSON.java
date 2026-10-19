@@ -4,7 +4,11 @@ import org.example.dao.GestionInscripciones;
 import org.example.dao.GestionJuegos;
 import org.example.dao.GestionPartidas;
 import org.example.dao.GestionSocios;
-import org.example.models.*;
+
+import org.example.models.Inscripcion;
+import org.example.models.Juego;
+import org.example.models.Partida;
+import org.example.models.Socio;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,16 +19,15 @@ import java.util.List;
 
 public class GestionJSON {
 
-    // Guarda el texto JSON en la carpeta ficheros
-    private static void guardar(String nombreArchivo, String texto) throws IOException {
+    // Guarda un archivo en la carpeta ficheros
+    private static void guardar(String archivo, String texto) throws IOException {
 
         Files.createDirectories(Path.of("ficheros"));
 
-        Files.writeString(Path.of("ficheros", nombreArchivo), texto, StandardCharsets.UTF_8);
+        Files.writeString(Path.of("ficheros", archivo), texto, StandardCharsets.UTF_8);
     }
 
-
-    // Convierte un dato de Java en un valor JSON valido
+    // Convierte un valor de Java a JSON
     private static String valor(Object dato) {
 
         if (dato == null) {
@@ -43,27 +46,21 @@ public class GestionJSON {
             char letra = texto.charAt(i);
 
             switch (letra) {
-
                 case '"':
                     resultado.append("\\\"");
                     break;
-
                 case '\\':
                     resultado.append("\\\\");
                     break;
-
                 case '\n':
                     resultado.append("\\n");
                     break;
-
                 case '\r':
                     resultado.append("\\r");
                     break;
-
                 case '\t':
                     resultado.append("\\t");
                     break;
-
                 default:
                     if (letra < 32) {
                         resultado.append(String.format("\\u%04x", (int) letra));
@@ -73,20 +70,23 @@ public class GestionJSON {
             }
         }
 
-        return resultado.append('"').toString();
+        resultado.append("\"");
+        return resultado.toString();
     }
 
-
-    // Escribe un campo JSON
+    // Añade un campo al texto JSON
     private static void campo(StringBuilder json, String nombre, Object dato, boolean ultimo, int espacios) {
 
         json.append(" ".repeat(espacios)).append(valor(nombre)).append(": ").append(valor(dato));
 
-        json.append(ultimo ? "\n" : ",\n");
+        if (ultimo) {
+            json.append("\n");
+        } else {
+            json.append(",\n");
+        }
     }
 
-
-    // Exporta todos los juegos
+    // Exporta los juegos
     public static void exportarJuegos() throws SQLException, IOException {
 
         List<Juego> juegos = GestionJuegos.listar();
@@ -110,10 +110,16 @@ public class GestionJSON {
             campo(json, "tipo", juego.getTipo(), false, 4);
             campo(json, "ubicacion", juego.getUbicacion(), false, 4);
             campo(json, "estado", juego.getEstado(), false, 4);
-            campo(json, "documento_propietaria", juego.getDocumentoPropietaria(), false, 4);
+            campo(json, "documento_propietario", juego.getDocumentoPropietario(), false, 4);
             campo(json, "fecha_alta", juego.getFechaAlta(), true, 4);
 
-            json.append("  }").append(i < juegos.size() - 1 ? ",\n" : "\n");
+            json.append("  }");
+
+            if (i < juegos.size() - 1) {
+                json.append(",");
+            }
+
+            json.append("\n");
         }
 
         json.append("]\n");
@@ -121,9 +127,8 @@ public class GestionJSON {
         guardar("Juegos.json", json.toString());
     }
 
-
-    // Exporta todas las socias
-    public static void exportarSocias() throws SQLException, IOException {
+    // Exporta los socios
+    public static void exportarSocios() throws SQLException, IOException {
 
         List<Socio> socios = GestionSocios.listar();
 
@@ -142,16 +147,21 @@ public class GestionJSON {
             campo(json, "edad", socio.getEdad(), false, 4);
             campo(json, "email", socio.getEmail(), true, 4);
 
-            json.append("  }").append(i < socios.size() - 1 ? ",\n" : "\n");
+            json.append("  }");
+
+            if (i < socios.size() - 1) {
+                json.append(",");
+            }
+
+            json.append("\n");
         }
 
         json.append("]\n");
 
-        guardar("Socias.json", json.toString());
+        guardar("Socios.json", json.toString());
     }
 
-
-    // Exporta partidas, participantes y plazas libres
+    // Exporta partidas con participantes y plazas libres
     public static void exportarPartidas() throws SQLException, IOException {
 
         List<Partida> partidas = GestionPartidas.listar();
@@ -184,8 +194,6 @@ public class GestionJSON {
 
             json.append("    \"participantes\": [\n");
 
-
-            // Recorre las personas inscritas en la partida
             for (int j = 0; j < participantes.size(); j++) {
 
                 Inscripcion inscripcion = participantes.get(j);
@@ -193,18 +201,22 @@ public class GestionJSON {
                 String nombre;
                 String tipo;
 
-                if (inscripcion.getDocumentoSocia() != null) {
+                if (inscripcion.getDocumentoSocio() != null) {
 
                     tipo = "socio";
 
-                    Socio socio = GestionSocios.buscar(inscripcion.getDocumentoSocia());
+                    Socio socio = GestionSocios.buscar(inscripcion.getDocumentoSocio());
 
-                    nombre = socio == null ? null : socio.getNombre() + " " + socio.getApellidos();
+                    if (socio == null) {
+                        nombre = null;
+                    } else {
+                        nombre = socio.getNombre() + " " + socio.getApellidos();
+                    }
 
                 } else {
 
-                    tipo = "invitada";
-                    nombre = inscripcion.getNombreInvitada();
+                    tipo = "invitado";
+                    nombre = inscripcion.getNombreInvitado();
                 }
 
                 json.append("      {\n");
@@ -214,16 +226,27 @@ public class GestionJSON {
                 campo(json, "tipo", tipo, false, 8);
                 campo(json, "nombre", nombre, false, 8);
 
-                campo(json, "documento_socia", inscripcion.getDocumentoSocia(), false, 8);
+                campo(json, "documento_socio", inscripcion.getDocumentoSocio(), false, 8);
 
-                campo(json, "ganadora", inscripcion.isGanadora(), true, 8);
+                campo(json, "ganador", inscripcion.isGanador(), true, 8);
 
-                json.append("      }").append(j < participantes.size() - 1 ? ",\n" : "\n");
+                json.append("      }");
+
+                if (j < participantes.size() - 1) {
+                    json.append(",");
+                }
+
+                json.append("\n");
             }
 
             json.append("    ]\n");
+            json.append("  }");
 
-            json.append("  }").append(i < partidas.size() - 1 ? ",\n" : "\n");
+            if (i < partidas.size() - 1) {
+                json.append(",");
+            }
+
+            json.append("\n");
         }
 
         json.append("]\n");
@@ -231,24 +254,21 @@ public class GestionJSON {
         guardar("Partidas.json", json.toString());
     }
 
-
-    // Exporta los tres archivos
+    // Exporta todos los archivos JSON
     public static void exportarTodo() throws SQLException, IOException {
 
         exportarJuegos();
-        exportarSocias();
+        exportarSocios();
         exportarPartidas();
     }
 
-
-    // Permite probar la exportacion directamente
+    // Prueba individual
     public static void main(String[] args) {
 
         try {
 
             exportarTodo();
-
-            System.out.println("Exportacion JSON correcta en la carpeta ficheros");
+            System.out.println("JSON exportados correctamente");
 
         } catch (SQLException | IOException e) {
 

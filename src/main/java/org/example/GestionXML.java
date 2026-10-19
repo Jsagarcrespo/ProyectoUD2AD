@@ -2,9 +2,11 @@ package org.example;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+
 import org.example.dao.GestionJuegos;
 import org.example.dao.GestionPartidas;
 import org.example.dao.GestionSocios;
+
 import org.example.models.Juego;
 import org.example.models.Partida;
 import org.example.models.Socio;
@@ -17,64 +19,75 @@ import java.util.ArrayList;
 
 public class GestionXML {
 
-    // Crea la carpeta donde se guardaran los archivos XML
+    // Crea la carpeta de exportacion
     private static void crearCarpeta() throws IOException {
+
         File carpeta = new File("ficheros");
 
         if (!carpeta.exists() && !carpeta.mkdirs()) {
-            throw new IOException("No se ha podido crear la carpeta ficheros");
+            throw new IOException("No se puede crear la carpeta ficheros");
         }
     }
 
-    // Exporta todos los juegos de MariaDB al archivo Juegos.xml
+    // Exporta juegos
     public static void exportarJuegos() throws SQLException, IOException {
+
         ArrayList<Juego> juegos = new ArrayList<>(GestionJuegos.listar());
 
         XStream xstream = new XStream(new DomDriver());
+
         xstream.alias("JuegosAsociacion", ArrayList.class);
         xstream.alias("Juego", Juego.class);
 
         crearCarpeta();
 
         try (FileOutputStream salida = new FileOutputStream("ficheros/Juegos.xml")) {
+
             xstream.toXML(juegos, salida);
         }
     }
 
-    // Exporta todas las socias de MariaDB al archivo Socias.xml
-    public static void exportarSocias() throws SQLException, IOException {
+    // Exporta socios
+    public static void exportarSocios() throws SQLException, IOException {
+
         ArrayList<Socio> socios = new ArrayList<>(GestionSocios.listar());
 
         XStream xstream = new XStream(new DomDriver());
-        xstream.alias("SociasAsociacion", ArrayList.class);
+
+        xstream.alias("SociosAsociacion", ArrayList.class);
         xstream.alias("Socio", Socio.class);
 
         crearCarpeta();
 
-        try (FileOutputStream salida = new FileOutputStream("ficheros/Socias.xml")) {
+        try (FileOutputStream salida = new FileOutputStream("ficheros/Socios.xml")) {
+
             xstream.toXML(socios, salida);
         }
     }
 
-    // Exporta todas las partidas de MariaDB al archivo Partidas.xml
+    // Exporta partidas
     public static void exportarPartidas() throws SQLException, IOException {
+
         ArrayList<Partida> partidas = new ArrayList<>(GestionPartidas.listar());
 
         XStream xstream = new XStream(new DomDriver());
+
         xstream.alias("PartidasAsociacion", ArrayList.class);
         xstream.alias("Partida", Partida.class);
 
         crearCarpeta();
 
         try (FileOutputStream salida = new FileOutputStream("ficheros/Partidas.xml")) {
+
             xstream.toXML(partidas, salida);
         }
     }
 
-    // Exporta los tres tipos de datos con una sola opcion del menu
+    // Exporta todos los datos
     public static void exportarTodo() throws SQLException, IOException {
+
         exportarJuegos();
-        exportarSocias();
+        exportarSocios();
         exportarPartidas();
     }
 }
