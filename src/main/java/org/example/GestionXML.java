@@ -4,10 +4,10 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.example.dao.GestionJuegos;
 import org.example.dao.GestionPartidas;
-import org.example.dao.GestionSocias;
+import org.example.dao.GestionSocios;
 import org.example.models.Juego;
 import org.example.models.Partida;
-import org.example.models.Socia;
+import org.example.models.Socio;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,16 +43,16 @@ public class GestionXML {
 
     // Exporta todas las socias de MariaDB al archivo Socias.xml
     public static void exportarSocias() throws SQLException, IOException {
-        ArrayList<Socia> socias = new ArrayList<>(GestionSocias.listar());
+        ArrayList<Socio> socios = new ArrayList<>(GestionSocios.listar());
 
         XStream xstream = new XStream(new DomDriver());
         xstream.alias("SociasAsociacion", ArrayList.class);
-        xstream.alias("Socia", Socia.class);
+        xstream.alias("Socio", Socio.class);
 
         crearCarpeta();
 
         try (FileOutputStream salida = new FileOutputStream("ficheros/Socias.xml")) {
-            xstream.toXML(socias, salida);
+            xstream.toXML(socios, salida);
         }
     }
 

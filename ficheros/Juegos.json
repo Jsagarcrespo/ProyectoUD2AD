@@ -28,5 +28,20 @@
     "estado": "disponible",
     "documento_propietaria": null,
     "fecha_alta": "2026-10-13"
+  },
+  {
+    "id": 4,
+    "nombre": "Juego Prueba UD2",
+    "autores": "Autor Prueba",
+    "descripcion": "Juego para comprobar el CRUD",
+    "min_jugadores": 2,
+    "max_jugadores": 2,
+    "duracion_min": 30,
+    "tematica": "Estrategia",
+    "tipo": "competitivo",
+    "ubicacion": "Estanteria A",
+    "estado": "disponible",
+    "documento_propietaria": null,
+    "fecha_alta": "2026-10-19"
   }
 ]

@@ -1,26 +1,43 @@
 package org.example.models;
 
 public class Inscripcion {
+
     private int id;
     private int idPartida;
-    private String documentoSocia;
-    private String nombreInvitada;
-    private boolean ganadora;
 
-    public Inscripcion(int id, int idPartida, String documentoSocia, String nombreInvitada, boolean ganadora) {
+    private String documentoSocio;
+    private String nombreInvitado;
+
+    private boolean ganador;
+
+
+    // Constructor
+    public Inscripcion(int id, int idPartida, String documentoSocio, String nombreInvitado, boolean ganador) {
+
         this.id = id;
         this.idPartida = idPartida;
-        this.documentoSocia = documentoSocia;
-        this.nombreInvitada = nombreInvitada;
-        this.ganadora = ganadora;
+        this.documentoSocio = documentoSocio;
+        this.nombreInvitado = nombreInvitado;
+        this.ganador = ganador;
     }
 
+
+    // Comprueba que la inscripcion es correcta
     public void validar() {
-        boolean socia = documentoSocia != null && !documentoSocia.isBlank();
-        boolean invitada = nombreInvitada != null && !nombreInvitada.isBlank();
-        if (idPartida <= 0 || socia == invitada)
-            throw new IllegalArgumentException("La inscripcion debe ser de una socia O de una invitada.");
+
+        boolean socio = documentoSocio != null && !documentoSocio.isBlank();
+
+        boolean invitado = nombreInvitado != null && !nombreInvitado.isBlank();
+
+        if (idPartida <= 0) {
+            throw new IllegalArgumentException("La partida no es valida");
+        }
+
+        if (socio == invitado) {
+            throw new IllegalArgumentException("La inscripcion debe ser de un socio " + "o de un invitado, pero no de ambos");
+        }
     }
+
 
     public int getId() {
         return id;
@@ -30,15 +47,15 @@ public class Inscripcion {
         return idPartida;
     }
 
-    public String getDocumentoSocia() {
-        return documentoSocia;
+    public String getDocumentoSocio() {
+        return documentoSocio;
     }
 
-    public String getNombreInvitada() {
-        return nombreInvitada;
+    public String getNombreInvitado() {
+        return nombreInvitado;
     }
 
-    public boolean isGanadora() {
-        return ganadora;
+    public boolean isGanador() {
+        return ganador;
     }
 }

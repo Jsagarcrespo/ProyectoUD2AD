@@ -64,7 +64,7 @@ CREATE TABLE `inscripciones` (
   UNIQUE KEY `id_partida` (`id_partida`,`documento_socia`),
   KEY `documento_socia` (`documento_socia`),
   CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`id_partida`) REFERENCES `partidas` (`id`),
-  CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`documento_socia`) REFERENCES `socias` (`documento`),
+  CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`documento_socia`) REFERENCES `socios` (`documento`),
   CONSTRAINT `CONSTRAINT_1` CHECK (`documento_socia` is not null and `nombre_invitada` is null or `documento_socia` is null and `nombre_invitada` is not null)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -104,7 +104,7 @@ CREATE TABLE `juegos` (
   `fecha_alta` date NOT NULL,
   PRIMARY KEY (`id`),
   KEY `documento_propietaria` (`documento_propietaria`),
-  CONSTRAINT `juegos_ibfk_1` FOREIGN KEY (`documento_propietaria`) REFERENCES `socias` (`documento`),
+  CONSTRAINT `juegos_ibfk_1` FOREIGN KEY (`documento_propietaria`) REFERENCES `socios` (`documento`),
   CONSTRAINT `CONSTRAINT_1` CHECK (`min_jugadores` >= 1),
   CONSTRAINT `CONSTRAINT_2` CHECK (`max_jugadores` >= `min_jugadores`),
   CONSTRAINT `CONSTRAINT_3` CHECK (`duracion_min` > 0)
@@ -156,13 +156,13 @@ INSERT INTO `partidas` VALUES
 UNLOCK TABLES;
 
 --
--- Table structure for table `socias`
+-- Table structure for table `socios`
 --
 
-DROP TABLE IF EXISTS `socias`;
+DROP TABLE IF EXISTS `socios`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `socias` (
+CREATE TABLE `socios` (
   `documento` varchar(20) NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `apellidos` varchar(100) NOT NULL,
@@ -175,14 +175,14 @@ CREATE TABLE `socias` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `socias`
+-- Dumping data for table `socios`
 --
 
-LOCK TABLES `socias` WRITE;
-/*!40000 ALTER TABLE `socias` DISABLE KEYS */;
-INSERT INTO `socias` VALUES
+LOCK TABLES `socios` WRITE;
+/*!40000 ALTER TABLE `socios` DISABLE KEYS */;
+INSERT INTO `socios` VALUES
 ('12345678A','Ana','Garcia','600123456',28,'ana@ejemplo.com');
-/*!40000 ALTER TABLE `socias` ENABLE KEYS */;
+/*!40000 ALTER TABLE `socios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

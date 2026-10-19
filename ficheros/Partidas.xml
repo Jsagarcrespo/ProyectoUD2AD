@@ -1,0 +1,10 @@
+<list>
+  <Partida>
+    <id>1</id>
+    <idJuego>3</idJuego>
+    <fecha>2026-10-20</fecha>
+    <hora>17:00:00</hora>
+    <jugadoresDeseados>4</jugadoresDeseados>
+    <estado>programada</estado>
+  </Partida>
+</list>

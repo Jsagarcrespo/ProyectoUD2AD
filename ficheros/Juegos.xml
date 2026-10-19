@@ -1,0 +1,43 @@
+<list>
+  <Juego>
+    <id>1</id>
+    <nombre>Carcassonne</nombre>
+    <autores>Klaus-Jürgen Wrede</autores>
+    <descripcion>Juego de colocacion de losetas</descripcion>
+    <tematica>Estrategia</tematica>
+    <tipo>competitivo</tipo>
+    <ubicacion>Estanteria A1</ubicacion>
+    <estado>disponible</estado>
+    <documentoPropietaria>12345678A</documentoPropietaria>
+    <fechaAlta>2026-10-13</fechaAlta>
+    <minJugadores>2</minJugadores>
+    <maxJugadores>5</maxJugadores>
+    <duracionMin>45</duracionMin>
+  </Juego>
+  <Juego>
+    <id>3</id>
+    <nombre>Catan</nombre>
+    <autores>Klaus Teuber</autores>
+    <tipo>competitivo</tipo>
+    <ubicacion>Estanteria A2</ubicacion>
+    <estado>disponible</estado>
+    <fechaAlta>2026-10-13</fechaAlta>
+    <minJugadores>3</minJugadores>
+    <maxJugadores>4</maxJugadores>
+    <duracionMin>90</duracionMin>
+  </Juego>
+  <Juego>
+    <id>4</id>
+    <nombre>Juego Prueba UD2</nombre>
+    <autores>Autor Prueba</autores>
+    <descripcion>Juego para comprobar el CRUD</descripcion>
+    <tematica>Estrategia</tematica>
+    <tipo>competitivo</tipo>
+    <ubicacion>Estanteria A</ubicacion>
+    <estado>disponible</estado>
+    <fechaAlta>2026-10-19</fechaAlta>
+    <minJugadores>2</minJugadores>
+    <maxJugadores>2</maxJugadores>
+    <duracionMin>30</duracionMin>
+  </Juego>
+</list>

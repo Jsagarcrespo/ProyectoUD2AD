@@ -3,13 +3,10 @@ package org.example;
 import org.example.dao.GestionAsociacion;
 import org.example.dao.GestionInscripciones;
 import org.example.dao.GestionPartidas;
-import org.example.dao.GestionSocias;
-import org.example.models.Asociacion;
-import org.example.models.Inscripcion;
-import org.example.models.Juego;
-import org.example.models.Partida;
-import org.example.models.Socia;
+import org.example.dao.GestionSocios;
+import org.example.models.*;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,7 +20,23 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
+    public static void main(String[] args) throws IOException {
 
+
+        SwingUtilities.invokeLater(() -> {
+
+            VentanaPrincipal ventana = new VentanaPrincipal();
+            ventana.setVisible(true);
+
+        });
+
+
+    }
+
+
+
+
+/*
     public static void main(String[] args) {
 
         try {
@@ -387,17 +400,17 @@ public class Main {
 
                     case 1:
 
-                        mostrarSocias(GestionSocias.listar());
+                        mostrarSocias(GestionSocios.listar());
                         break;
 
                     case 2: {
 
-                        Socia socia = GestionSocias.buscar(leerTexto("Documento: "));
+                        Socio socio = GestionSocios.buscar(leerTexto("Documento: "));
 
-                        if (socia == null) {
-                            System.out.println("Socia no encontrada");
+                        if (socio == null) {
+                            System.out.println("Socio no encontrada");
                         } else {
-                            mostrarSocia(socia);
+                            mostrarSocia(socio);
                         }
 
                         break;
@@ -407,11 +420,11 @@ public class Main {
 
                         String documento = leerTexto("Documento: ");
 
-                        Socia socia = leerDatosSocia(documento);
+                        Socio socio = leerDatosSocia(documento);
 
-                        GestionSocias.anadir(socia);
+                        GestionSocios.anadir(socio);
 
-                        System.out.println("Socia añadida correctamente");
+                        System.out.println("Socio añadida correctamente");
                         break;
                     }
 
@@ -419,20 +432,20 @@ public class Main {
 
                         String documento = leerTexto("Documento a modificar: ");
 
-                        Socia socia = GestionSocias.buscar(documento);
+                        Socio socio = GestionSocios.buscar(documento);
 
-                        if (socia == null) {
-                            System.out.println("Socia no encontrada");
+                        if (socio == null) {
+                            System.out.println("Socio no encontrada");
                             break;
                         }
 
-                        mostrarSocia(socia);
+                        mostrarSocia(socio);
 
-                        if (GestionSocias.modificar(leerDatosSocia(documento))) {
+                        if (GestionSocios.modificar(leerDatosSocia(documento))) {
 
-                            System.out.println("Socia modificada correctamente");
+                            System.out.println("Socio modificada correctamente");
                         } else {
-                            System.out.println("No se ha modificado la socia");
+                            System.out.println("No se ha modificado la socio");
                         }
 
                         break;
@@ -444,10 +457,10 @@ public class Main {
 
                         if (confirmar("¿Eliminar la socia? (s/n): ")) {
 
-                            if (GestionSocias.eliminar(documento)) {
-                                System.out.println("Socia eliminada");
+                            if (GestionSocios.eliminar(documento)) {
+                                System.out.println("Socio eliminada");
                             } else {
-                                System.out.println("Socia no encontrada");
+                                System.out.println("Socio no encontrada");
                             }
                         }
 
@@ -458,10 +471,10 @@ public class Main {
 
                         String documento = leerTexto("Documento: ");
 
-                        if (GestionSocias.buscar(documento) == null) {
-                            System.out.println("Socia no encontrada");
+                        if (GestionSocios.buscar(documento) == null) {
+                            System.out.println("Socio no encontrada");
                         } else {
-                            System.out.println(GestionSocias.historial(documento));
+                            System.out.println(GestionSocios.historial(documento));
                         }
 
                         break;
@@ -469,7 +482,7 @@ public class Main {
 
                     case 7:
 
-                        mostrarSocias(GestionSocias.buscarPorNombre(leerTexto("Nombre o apellidos: ")));
+                        mostrarSocias(GestionSocios.buscarPorNombre(leerTexto("Nombre o apellidos: ")));
                         break;
 
                     case 0:
@@ -491,7 +504,7 @@ public class Main {
 
 
     // LEE LOS DATOS DE UNA SOCIA
-    private static Socia leerDatosSocia(String documento) throws IOException {
+    private static Socio leerDatosSocia(String documento) throws IOException {
 
         String nombre = leerTexto("Nombre: ");
         String apellidos = leerTexto("Apellidos: ");
@@ -499,34 +512,34 @@ public class Main {
         int edad = leerEntero("Edad: ");
         String email = leerTexto("Email: ");
 
-        return new Socia(documento, nombre, apellidos, telefono, edad, email);
+        return new Socio(documento, nombre, apellidos, telefono, edad, email);
     }
 
 
     // MUESTRA UNA LISTA DE SOCIAS
-    private static void mostrarSocias(List<Socia> socias) {
+    private static void mostrarSocias(List<Socio> socios) {
 
-        if (socias.isEmpty()) {
-            System.out.println("No hay socias para mostrar");
+        if (socios.isEmpty()) {
+            System.out.println("No hay socios para mostrar");
             return;
         }
 
-        for (Socia socia : socias) {
-            mostrarSocia(socia);
+        for (Socio socio : socios) {
+            mostrarSocia(socio);
         }
     }
 
 
     // MUESTRA UNA SOCIA
-    private static void mostrarSocia(Socia socia) {
+    private static void mostrarSocia(Socio socio) {
 
-        System.out.println("\nDocumento: " + socia.getDocumento());
+        System.out.println("\nDocumento: " + socio.getDocumento());
 
-        System.out.println("Nombre: " + socia.getNombre() + " " + socia.getApellidos());
+        System.out.println("Nombre: " + socio.getNombre() + " " + socio.getApellidos());
 
-        System.out.println("Telefono: " + socia.getTelefono());
+        System.out.println("Telefono: " + socio.getTelefono());
 
-        System.out.println("Edad: " + socia.getEdad() + " | Email: " + socia.getEmail());
+        System.out.println("Edad: " + socio.getEdad() + " | Email: " + socio.getEmail());
     }
 
 
@@ -786,7 +799,7 @@ public class Main {
 
                         GestionInscripciones.inscribirSocia(partida, documento);
 
-                        System.out.println("Socia inscrita correctamente");
+                        System.out.println("Socio inscrita correctamente");
                         break;
                     }
 
@@ -1085,6 +1098,7 @@ public class Main {
         } else {
 
             System.out.println("Error de base de datos: " + e.getMessage());
-        }
-    }
+        }*/
+
 }
+

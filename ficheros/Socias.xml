@@ -1,0 +1,10 @@
+<list>
+  <Socia>
+    <documento>12345678A</documento>
+    <nombre>Ana</nombre>
+    <apellidos>Garcia</apellidos>
+    <telefono>600123456</telefono>
+    <edad>28</edad>
+    <email>ana@ejemplo.com</email>
+  </Socia>
+</list>

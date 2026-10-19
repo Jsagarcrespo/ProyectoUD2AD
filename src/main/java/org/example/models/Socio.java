@@ -1,6 +1,6 @@
 package org.example.models;
 
-public class Socia {
+public class Socio {
 
     private String documento;
     private String nombre;
@@ -9,9 +9,7 @@ public class Socia {
     private int edad;
     private String email;
 
-
-    // Constructor
-    public Socia(String documento, String nombre, String apellidos, String telefono, int edad, String email) {
+    public Socio(String documento, String nombre, String apellidos, String telefono, int edad, String email) {
 
         this.documento = documento;
         this.nombre = nombre;
@@ -21,8 +19,7 @@ public class Socia {
         this.email = email;
     }
 
-
-    // Comprueba que los datos de la socia sean correctos
+    // Comprueba que los datos sean correctos
     public void validar() {
 
         if (documento == null || documento.isBlank()) {
@@ -46,7 +43,6 @@ public class Socia {
         }
     }
 
-
     public String getDocumento() {
         return documento;
     }
@@ -54,7 +50,6 @@ public class Socia {
     public void setDocumento(String documento) {
         this.documento = documento;
     }
-
 
     public String getNombre() {
         return nombre;
@@ -64,7 +59,6 @@ public class Socia {
         this.nombre = nombre;
     }
 
-
     public String getApellidos() {
         return apellidos;
     }
@@ -72,7 +66,6 @@ public class Socia {
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
     }
-
 
     public String getTelefono() {
         return telefono;
@@ -82,7 +75,6 @@ public class Socia {
         this.telefono = telefono;
     }
 
-
     public int getEdad() {
         return edad;
     }
@@ -90,7 +82,6 @@ public class Socia {
     public void setEdad(int edad) {
         this.edad = edad;
     }
-
 
     public String getEmail() {
         return email;

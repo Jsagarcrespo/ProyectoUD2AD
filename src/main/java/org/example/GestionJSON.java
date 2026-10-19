@@ -3,11 +3,8 @@ package org.example;
 import org.example.dao.GestionInscripciones;
 import org.example.dao.GestionJuegos;
 import org.example.dao.GestionPartidas;
-import org.example.dao.GestionSocias;
-import org.example.models.Inscripcion;
-import org.example.models.Juego;
-import org.example.models.Partida;
-import org.example.models.Socia;
+import org.example.dao.GestionSocios;
+import org.example.models.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -128,24 +125,24 @@ public class GestionJSON {
     // Exporta todas las socias
     public static void exportarSocias() throws SQLException, IOException {
 
-        List<Socia> socias = GestionSocias.listar();
+        List<Socio> socios = GestionSocios.listar();
 
         StringBuilder json = new StringBuilder("[\n");
 
-        for (int i = 0; i < socias.size(); i++) {
+        for (int i = 0; i < socios.size(); i++) {
 
-            Socia socia = socias.get(i);
+            Socio socio = socios.get(i);
 
             json.append("  {\n");
 
-            campo(json, "documento", socia.getDocumento(), false, 4);
-            campo(json, "nombre", socia.getNombre(), false, 4);
-            campo(json, "apellidos", socia.getApellidos(), false, 4);
-            campo(json, "telefono", socia.getTelefono(), false, 4);
-            campo(json, "edad", socia.getEdad(), false, 4);
-            campo(json, "email", socia.getEmail(), true, 4);
+            campo(json, "documento", socio.getDocumento(), false, 4);
+            campo(json, "nombre", socio.getNombre(), false, 4);
+            campo(json, "apellidos", socio.getApellidos(), false, 4);
+            campo(json, "telefono", socio.getTelefono(), false, 4);
+            campo(json, "edad", socio.getEdad(), false, 4);
+            campo(json, "email", socio.getEmail(), true, 4);
 
-            json.append("  }").append(i < socias.size() - 1 ? ",\n" : "\n");
+            json.append("  }").append(i < socios.size() - 1 ? ",\n" : "\n");
         }
 
         json.append("]\n");
@@ -198,11 +195,11 @@ public class GestionJSON {
 
                 if (inscripcion.getDocumentoSocia() != null) {
 
-                    tipo = "socia";
+                    tipo = "socio";
 
-                    Socia socia = GestionSocias.buscar(inscripcion.getDocumentoSocia());
+                    Socio socio = GestionSocios.buscar(inscripcion.getDocumentoSocia());
 
-                    nombre = socia == null ? null : socia.getNombre() + " " + socia.getApellidos();
+                    nombre = socio == null ? null : socio.getNombre() + " " + socio.getApellidos();
 
                 } else {
 

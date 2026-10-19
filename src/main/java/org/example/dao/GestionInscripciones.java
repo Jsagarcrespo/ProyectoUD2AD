@@ -213,7 +213,7 @@ public class GestionInscripciones {
 
                     } else {
 
-                        texto.append(" | Socia");
+                        texto.append(" | Socio");
                     }
 
                     if (resultado.getBoolean("ganadora")) {
