@@ -1,0 +1,10 @@
+[
+  {
+    "documento": "12345678A",
+    "nombre": "Ana",
+    "apellidos": "Garcia",
+    "telefono": "600123456",
+    "edad": 28,
+    "email": "ana@ejemplo.com"
+  }
+]

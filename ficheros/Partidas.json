@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "id_juego": 3,
+    "nombre_juego": "Catan",
+    "fecha": "2026-10-20",
+    "hora": "17:00",
+    "jugadores_deseados": 4,
+    "plazas_libres": 2,
+    "estado": "programada",
+    "participantes": [
+      {
+        "id_inscripcion": 1,
+        "tipo": "socia",
+        "nombre": "Ana Garcia",
+        "documento_socia": "12345678A",
+        "ganadora": false
+      },
+      {
+        "id_inscripcion": 2,
+        "tipo": "invitada",
+        "nombre": "Pedro Martinez",
+        "documento_socia": null,
+        "ganadora": false
+      }
+    ]
+  }
+]

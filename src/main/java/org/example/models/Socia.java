@@ -1,14 +1,18 @@
 package org.example.models;
 
 public class Socia {
-        private String documento;
-        private String nombre;
-        private String apellidos;
-        private String telefono;
-        private int edad;
-        private String email;
 
+    private String documento;
+    private String nombre;
+    private String apellidos;
+    private String telefono;
+    private int edad;
+    private String email;
+
+
+    // Constructor
     public Socia(String documento, String nombre, String apellidos, String telefono, int edad, String email) {
+
         this.documento = documento;
         this.nombre = nombre;
         this.apellidos = apellidos;
@@ -16,6 +20,32 @@ public class Socia {
         this.edad = edad;
         this.email = email;
     }
+
+
+    // Comprueba que los datos de la socia sean correctos
+    public void validar() {
+
+        if (documento == null || documento.isBlank()) {
+            throw new IllegalArgumentException("El documento es obligatorio");
+        }
+
+        if (nombre == null || nombre.isBlank()) {
+            throw new IllegalArgumentException("El nombre es obligatorio");
+        }
+
+        if (apellidos == null || apellidos.isBlank()) {
+            throw new IllegalArgumentException("Los apellidos son obligatorios");
+        }
+
+        if (edad < 0) {
+            throw new IllegalArgumentException("La edad no puede ser negativa");
+        }
+
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("El email es obligatorio");
+        }
+    }
+
 
     public String getDocumento() {
         return documento;
@@ -25,6 +55,7 @@ public class Socia {
         this.documento = documento;
     }
 
+
     public String getNombre() {
         return nombre;
     }
@@ -32,6 +63,7 @@ public class Socia {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
 
     public String getApellidos() {
         return apellidos;
@@ -41,6 +73,7 @@ public class Socia {
         this.apellidos = apellidos;
     }
 
+
     public String getTelefono() {
         return telefono;
     }
@@ -49,6 +82,7 @@ public class Socia {
         this.telefono = telefono;
     }
 
+
     public int getEdad() {
         return edad;
     }
@@ -56,6 +90,7 @@ public class Socia {
     public void setEdad(int edad) {
         this.edad = edad;
     }
+
 
     public String getEmail() {
         return email;

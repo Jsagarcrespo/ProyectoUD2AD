@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "nombre": "Carcassonne",
+    "autores": "Klaus-Jürgen Wrede",
+    "descripcion": "Juego de colocacion de losetas",
+    "min_jugadores": 2,
+    "max_jugadores": 5,
+    "duracion_min": 45,
+    "tematica": "Estrategia",
+    "tipo": "competitivo",
+    "ubicacion": "Estanteria A1",
+    "estado": "disponible",
+    "documento_propietaria": "12345678A",
+    "fecha_alta": "2026-10-13"
+  },
+  {
+    "id": 3,
+    "nombre": "Catan",
+    "autores": "Klaus Teuber",
+    "descripcion": null,
+    "min_jugadores": 3,
+    "max_jugadores": 4,
+    "duracion_min": 90,
+    "tematica": null,
+    "tipo": "competitivo",
+    "ubicacion": "Estanteria A2",
+    "estado": "disponible",
+    "documento_propietaria": null,
+    "fecha_alta": "2026-10-13"
+  }
+]

@@ -1,7 +1,7 @@
 package org.example.dao;
 
-import org.example.conexion.ConexionBD;
-import org.example.modelo.*;
+import org.example.utils.DatabaseConnection;
+import org.example.models.Partida;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class GestionPartidas {
 
     public static List<Partida> listar() throws SQLException {
         List<Partida> lista = new ArrayList<>();
-        try (Connection c = ConexionBD.conectar();
+        try (Connection c = DatabaseConnection.conectar();
              PreparedStatement p = c.prepareStatement("SELECT * FROM partidas ORDER BY fecha, hora");
              ResultSet r = p.executeQuery()) {
             while (r.next()) lista.add(convertir(r));
@@ -25,7 +25,7 @@ public class GestionPartidas {
     }
 
     public static Partida buscar(int id) throws SQLException {
-        try (Connection c = ConexionBD.conectar();
+        try (Connection c = DatabaseConnection.conectar();
              PreparedStatement p = c.prepareStatement("SELECT * FROM partidas WHERE id=?")) {
             p.setInt(1, id);
             try (ResultSet r = p.executeQuery()) {
@@ -46,7 +46,7 @@ public class GestionPartidas {
     }
 
     public static void anadir(Partida partida) throws SQLException {
-        try (Connection c = ConexionBD.conectar()) {
+        try (Connection c = DatabaseConnection.conectar()) {
             int[] rango = rangoJuego(c, partida.getIdJuego());
             partida.validar(rango[0], rango[1]);
             String sql = "INSERT INTO partidas(id_juego,fecha,hora,jugadores_deseados,estado) " +
@@ -59,7 +59,7 @@ public class GestionPartidas {
     }
 
     public static boolean modificar(Partida partida) throws SQLException {
-        try (Connection c = ConexionBD.conectar()) {
+        try (Connection c = DatabaseConnection.conectar()) {
             c.setAutoCommit(false);
             try {
                 int juegoActual;
@@ -103,7 +103,7 @@ public class GestionPartidas {
     }
 
     public static boolean cancelar(int id) throws SQLException {
-        try (Connection c = ConexionBD.conectar();
+        try (Connection c = DatabaseConnection.conectar();
              PreparedStatement p = c.prepareStatement(
                      "UPDATE partidas SET estado='cancelada' WHERE id=?")) {
             p.setInt(1, id);
@@ -113,7 +113,7 @@ public class GestionPartidas {
 
     public static boolean eliminar(int id) throws SQLException {
         // Si hay inscripciones, MariaDB impide eliminar la partida. Usa 'cancelar'.
-        try (Connection c = ConexionBD.conectar();
+        try (Connection c = DatabaseConnection.conectar();
              PreparedStatement p = c.prepareStatement("DELETE FROM partidas WHERE id=?")) {
             p.setInt(1, id);
             return p.executeUpdate() > 0;
@@ -132,7 +132,7 @@ public class GestionPartidas {
     }
 
     public static int plazasLibres(int id) throws SQLException {
-        try (Connection c = ConexionBD.conectar()) {
+        try (Connection c = DatabaseConnection.conectar()) {
             try (PreparedStatement p = c.prepareStatement(
                     "SELECT jugadores_deseados FROM partidas WHERE id=?")) {
                 p.setInt(1, id);
@@ -151,7 +151,7 @@ public class GestionPartidas {
                 "GROUP BY p.id,j.nombre,p.fecha,p.hora,p.jugadores_deseados,p.estado " +
                 "ORDER BY p.fecha,p.hora";
         StringBuilder s = new StringBuilder();
-        try (Connection c = ConexionBD.conectar();
+        try (Connection c = DatabaseConnection.conectar();
              PreparedStatement p = c.prepareStatement(sql);
              ResultSet r = p.executeQuery()) {
             while (r.next()) s.append("#").append(r.getInt(1)).append(" | ")
@@ -168,7 +168,7 @@ public class GestionPartidas {
     public static List<Partida> listarPorJuego(int idJuego) throws SQLException {
         List<Partida> lista = new ArrayList<>();
         String sql = "SELECT * FROM partidas WHERE id_juego = ? ORDER BY fecha, hora";
-        try (Connection c = ConexionBD.conectar();
+        try (Connection c = DatabaseConnection.conectar();
              PreparedStatement p = c.prepareStatement(sql)) {
             p.setInt(1, idJuego);
             try (ResultSet r = p.executeQuery()) {
@@ -181,7 +181,7 @@ public class GestionPartidas {
     public static List<Partida> listarPorFecha(java.time.LocalDate fecha) throws SQLException {
         List<Partida> lista = new ArrayList<>();
         String sql = "SELECT * FROM partidas WHERE fecha = ? ORDER BY hora";
-        try (Connection c = ConexionBD.conectar();
+        try (Connection c = DatabaseConnection.conectar();
              PreparedStatement p = c.prepareStatement(sql)) {
             p.setDate(1, Date.valueOf(fecha));
             try (ResultSet r = p.executeQuery()) {
@@ -195,7 +195,7 @@ public class GestionPartidas {
     public static List<Partida> listarPorEstado(String estado) throws SQLException {
         List<Partida> lista = new ArrayList<>();
         String sql = "SELECT * FROM partidas WHERE estado = ? ORDER BY fecha, hora";
-        try (Connection c = ConexionBD.conectar();
+        try (Connection c = DatabaseConnection.conectar();
              PreparedStatement p = c.prepareStatement(sql)) {
             p.setString(1, estado);
             try (ResultSet r = p.executeQuery()) {
@@ -209,7 +209,7 @@ public class GestionPartidas {
     public static boolean finalizar(int id) throws SQLException {
         String sql = "UPDATE partidas SET estado = 'finalizada' " +
                 "WHERE id = ? AND estado = 'programada'";
-        try (Connection c = ConexionBD.conectar();
+        try (Connection c = DatabaseConnection.conectar();
              PreparedStatement p = c.prepareStatement(sql)) {
             p.setInt(1, id);
             return p.executeUpdate() > 0;
