@@ -1,0 +1,19 @@
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: juegos_mariadb
+
+    environment:
+      MARIADB_ROOT_PASSWORD: root123
+      MARIADB_DATABASE: asociacion_juegos
+      MARIADB_USER: juegos_user
+      MARIADB_PASSWORD: juegos123
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - datos_juegos:/var/lib/mysql
+
+volumes:
+  datos_juegos:

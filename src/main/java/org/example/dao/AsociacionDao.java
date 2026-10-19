@@ -1,13 +1,14 @@
 package org.example.dao;
 
-import org.example.conexion.ConexionBD;
-import org.example.modelo.*;
+import org.example.models.Asociacion;
+import org.example.utils.DatabaseConnection;
 
 import java.sql.*;
 
 public class GestionAsociacion {
     public static Asociacion obtener() throws SQLException {
         String sql = "SELECT * FROM asociacion WHERE id=1";
+        DatabaseConnection ConexionBD;
         try (Connection c = ConexionBD.conectar();
              PreparedStatement p = c.prepareStatement(sql);
              ResultSet r = p.executeQuery()) {
@@ -37,6 +38,5 @@ public class GestionAsociacion {
         }
     }
 
-    // Una sola asociacion. No hace falta un CRUD completo de altas y bajas;
-    // en el enunciado se pide poder consultar y modificar sus datos.
+
 }
