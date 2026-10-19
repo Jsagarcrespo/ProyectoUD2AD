@@ -1,4 +1,3 @@
-
 package org.example.dao;
 
 import org.example.models.Inscripcion;
@@ -12,16 +11,13 @@ public class GestionInscripciones {
 
 
     // Obtiene las inscripciones de una partida
-    public static List<Inscripcion> listar(int idPartida)
-            throws SQLException {
+    public static List<Inscripcion> listar(int idPartida) throws SQLException {
 
         List<Inscripcion> inscripciones = new ArrayList<>();
 
-        String sql = "SELECT * FROM inscripciones " +
-                "WHERE id_partida=? ORDER BY id";
+        String sql = "SELECT * FROM inscripciones " + "WHERE id_partida=? ORDER BY id";
 
-        try (Connection conexion = DatabaseConnection.conectar();
-             PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+        try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
             sentencia.setInt(1, idPartida);
 
@@ -29,13 +25,7 @@ public class GestionInscripciones {
 
                 while (resultado.next()) {
 
-                    Inscripcion inscripcion = new Inscripcion(
-                            resultado.getInt("id"),
-                            resultado.getInt("id_partida"),
-                            resultado.getString("documento_socia"),
-                            resultado.getString("nombre_invitada"),
-                            resultado.getBoolean("ganadora")
-                    );
+                    Inscripcion inscripcion = new Inscripcion(resultado.getInt("id"), resultado.getInt("id_partida"), resultado.getString("documento_socia"), resultado.getString("nombre_invitada"), resultado.getBoolean("ganadora"));
 
                     inscripciones.add(inscripcion);
                 }
@@ -47,32 +37,25 @@ public class GestionInscripciones {
 
 
     // Inscribe una socia en una partida
-    public static void inscribirSocia(int idPartida, String documento)
-            throws SQLException {
+    public static void inscribirSocia(int idPartida, String documento) throws SQLException {
 
-        Inscripcion inscripcion = new Inscripcion(
-                0, idPartida, documento, null, false
-        );
+        Inscripcion inscripcion = new Inscripcion(0, idPartida, documento, null, false);
 
         inscribir(inscripcion);
     }
 
 
     // Inscribe una persona invitada en una partida
-    public static void inscribirInvitada(int idPartida, String nombre)
-            throws SQLException {
+    public static void inscribirInvitada(int idPartida, String nombre) throws SQLException {
 
-        Inscripcion inscripcion = new Inscripcion(
-                0, idPartida, null, nombre, false
-        );
+        Inscripcion inscripcion = new Inscripcion(0, idPartida, null, nombre, false);
 
         inscribir(inscripcion);
     }
 
 
     // Guarda una inscripcion comprobando que haya plazas
-    public static void inscribir(Inscripcion inscripcion)
-            throws SQLException {
+    public static void inscribir(Inscripcion inscripcion) throws SQLException {
 
         inscripcion.validar();
 
@@ -86,20 +69,16 @@ public class GestionInscripciones {
                 String estado;
 
                 // Busca la partida y comprueba su estado
-                String sqlPartida =
-                        "SELECT jugadores_deseados, estado " +
-                                "FROM partidas WHERE id=? FOR UPDATE";
+                String sqlPartida = "SELECT jugadores_deseados, estado " + "FROM partidas WHERE id=? FOR UPDATE";
 
-                try (PreparedStatement sentencia =
-                             conexion.prepareStatement(sqlPartida)) {
+                try (PreparedStatement sentencia = conexion.prepareStatement(sqlPartida)) {
 
                     sentencia.setInt(1, inscripcion.getIdPartida());
 
                     try (ResultSet resultado = sentencia.executeQuery()) {
 
                         if (!resultado.next()) {
-                            throw new IllegalArgumentException(
-                                    "La partida no existe");
+                            throw new IllegalArgumentException("La partida no existe");
                         }
 
                         plazas = resultado.getInt("jugadores_deseados");
@@ -111,20 +90,16 @@ public class GestionInscripciones {
                 // Solo se puede inscribir en partidas programadas
                 if (!estado.equals("programada")) {
 
-                    throw new IllegalArgumentException(
-                            "La partida no admite inscripciones");
+                    throw new IllegalArgumentException("La partida no admite inscripciones");
                 }
 
 
                 // Cuenta las personas inscritas
                 int inscritos = 0;
 
-                String sqlContar =
-                        "SELECT COUNT(*) FROM inscripciones " +
-                                "WHERE id_partida=?";
+                String sqlContar = "SELECT COUNT(*) FROM inscripciones " + "WHERE id_partida=?";
 
-                try (PreparedStatement sentencia =
-                             conexion.prepareStatement(sqlContar)) {
+                try (PreparedStatement sentencia = conexion.prepareStatement(sqlContar)) {
 
                     sentencia.setInt(1, inscripcion.getIdPartida());
 
@@ -140,19 +115,14 @@ public class GestionInscripciones {
                 // Comprueba si quedan plazas libres
                 if (inscritos >= plazas) {
 
-                    throw new IllegalArgumentException(
-                            "No quedan plazas libres en esta partida");
+                    throw new IllegalArgumentException("No quedan plazas libres en esta partida");
                 }
 
 
                 // Guarda la nueva inscripcion
-                String sqlInsertar =
-                        "INSERT INTO inscripciones " +
-                                "(id_partida, documento_socia, nombre_invitada) " +
-                                "VALUES (?, ?, ?)";
+                String sqlInsertar = "INSERT INTO inscripciones " + "(id_partida, documento_socia, nombre_invitada) " + "VALUES (?, ?, ?)";
 
-                try (PreparedStatement sentencia =
-                             conexion.prepareStatement(sqlInsertar)) {
+                try (PreparedStatement sentencia = conexion.prepareStatement(sqlInsertar)) {
 
                     sentencia.setInt(1, inscripcion.getIdPartida());
 
@@ -162,8 +132,7 @@ public class GestionInscripciones {
 
                     } else {
 
-                        sentencia.setString(
-                                2, inscripcion.getDocumentoSocia());
+                        sentencia.setString(2, inscripcion.getDocumentoSocia());
                     }
 
                     if (inscripcion.getNombreInvitada() == null) {
@@ -172,8 +141,7 @@ public class GestionInscripciones {
 
                     } else {
 
-                        sentencia.setString(
-                                3, inscripcion.getNombreInvitada());
+                        sentencia.setString(3, inscripcion.getNombreInvitada());
                     }
 
                     sentencia.executeUpdate();
@@ -195,8 +163,7 @@ public class GestionInscripciones {
 
         String sql = "DELETE FROM inscripciones WHERE id=?";
 
-        try (Connection conexion = DatabaseConnection.conectar();
-             PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+        try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
             sentencia.setInt(1, id);
 
@@ -206,13 +173,11 @@ public class GestionInscripciones {
 
 
     // Marca o desmarca una inscripcion como ganadora
-    public static boolean marcarGanadora(int id, boolean ganadora)
-            throws SQLException {
+    public static boolean marcarGanadora(int id, boolean ganadora) throws SQLException {
 
         String sql = "UPDATE inscripciones SET ganadora=? WHERE id=?";
 
-        try (Connection conexion = DatabaseConnection.conectar();
-             PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+        try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
             sentencia.setBoolean(1, ganadora);
             sentencia.setInt(2, id);
@@ -224,23 +189,13 @@ public class GestionInscripciones {
 
     // Muestra los participantes de una partida
     // indicando si son socias o invitadas
-    public static String participantes(int idPartida)
-            throws SQLException {
+    public static String participantes(int idPartida) throws SQLException {
 
-        String sql =
-                "SELECT i.id, " +
-                        "COALESCE(CONCAT(s.nombre, ' ', s.apellidos), " +
-                        "i.nombre_invitada) AS nombre, " +
-                        "i.documento_socia, i.ganadora " +
-                        "FROM inscripciones i " +
-                        "LEFT JOIN socias s " +
-                        "ON i.documento_socia=s.documento " +
-                        "WHERE i.id_partida=? ORDER BY i.id";
+        String sql = "SELECT i.id, " + "COALESCE(CONCAT(s.nombre, ' ', s.apellidos), " + "i.nombre_invitada) AS nombre, " + "i.documento_socia, i.ganadora " + "FROM inscripciones i " + "LEFT JOIN socias s " + "ON i.documento_socia=s.documento " + "WHERE i.id_partida=? ORDER BY i.id";
 
         StringBuilder texto = new StringBuilder();
 
-        try (Connection conexion = DatabaseConnection.conectar();
-             PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+        try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
             sentencia.setInt(1, idPartida);
 
@@ -248,11 +203,9 @@ public class GestionInscripciones {
 
                 while (resultado.next()) {
 
-                    texto.append("Inscripcion: ")
-                            .append(resultado.getInt("id"));
+                    texto.append("Inscripcion: ").append(resultado.getInt("id"));
 
-                    texto.append(" | Nombre: ")
-                            .append(resultado.getString("nombre"));
+                    texto.append(" | Nombre: ").append(resultado.getString("nombre"));
 
                     if (resultado.getString("documento_socia") == null) {
 
@@ -282,8 +235,7 @@ public class GestionInscripciones {
 
         String sql = "SELECT * FROM inscripciones WHERE id=?";
 
-        try (Connection conexion = DatabaseConnection.conectar();
-             PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+        try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
             sentencia.setInt(1, id);
 
@@ -291,13 +243,7 @@ public class GestionInscripciones {
 
                 if (resultado.next()) {
 
-                    return new Inscripcion(
-                            resultado.getInt("id"),
-                            resultado.getInt("id_partida"),
-                            resultado.getString("documento_socia"),
-                            resultado.getString("nombre_invitada"),
-                            resultado.getBoolean("ganadora")
-                    );
+                    return new Inscripcion(resultado.getInt("id"), resultado.getInt("id_partida"), resultado.getString("documento_socia"), resultado.getString("nombre_invitada"), resultado.getBoolean("ganadora"));
                 }
             }
         }
@@ -307,16 +253,13 @@ public class GestionInscripciones {
 
 
     // Obtiene las partidas en las que esta inscrita una socia
-    public static List<Inscripcion> listarPorSocia(String documento)
-            throws SQLException {
+    public static List<Inscripcion> listarPorSocia(String documento) throws SQLException {
 
         List<Inscripcion> inscripciones = new ArrayList<>();
 
-        String sql = "SELECT * FROM inscripciones " +
-                "WHERE documento_socia=? ORDER BY id_partida";
+        String sql = "SELECT * FROM inscripciones " + "WHERE documento_socia=? ORDER BY id_partida";
 
-        try (Connection conexion = DatabaseConnection.conectar();
-             PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+        try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
             sentencia.setString(1, documento);
 
@@ -324,13 +267,7 @@ public class GestionInscripciones {
 
                 while (resultado.next()) {
 
-                    Inscripcion inscripcion = new Inscripcion(
-                            resultado.getInt("id"),
-                            resultado.getInt("id_partida"),
-                            resultado.getString("documento_socia"),
-                            resultado.getString("nombre_invitada"),
-                            resultado.getBoolean("ganadora")
-                    );
+                    Inscripcion inscripcion = new Inscripcion(resultado.getInt("id"), resultado.getInt("id_partida"), resultado.getString("documento_socia"), resultado.getString("nombre_invitada"), resultado.getBoolean("ganadora"));
 
                     inscripciones.add(inscripcion);
                 }

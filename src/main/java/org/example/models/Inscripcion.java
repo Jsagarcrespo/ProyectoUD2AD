@@ -22,9 +22,23 @@ public class Inscripcion {
             throw new IllegalArgumentException("La inscripcion debe ser de una socia O de una invitada.");
     }
 
-    public int getId() { return id; }
-    public int getIdPartida() { return idPartida; }
-    public String getDocumentoSocia() { return documentoSocia; }
-    public String getNombreInvitada() { return nombreInvitada; }
-    public boolean isGanadora() { return ganadora; }
+    public int getId() {
+        return id;
+    }
+
+    public int getIdPartida() {
+        return idPartida;
+    }
+
+    public String getDocumentoSocia() {
+        return documentoSocia;
+    }
+
+    public String getNombreInvitada() {
+        return nombreInvitada;
+    }
+
+    public boolean isGanadora() {
+        return ganadora;
+    }
 }

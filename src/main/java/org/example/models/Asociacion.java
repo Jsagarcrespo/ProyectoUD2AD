@@ -25,11 +25,32 @@ public class Asociacion {
         if (razonSocial == null || razonSocial.isEmpty() || cif == null || cif.isEmpty())
             throw new IllegalArgumentException("Razon social y CIF obligatorios.");
     }
-    public int getId() { return id; }
-    public String getRazonSocial() { return razonSocial; }
-    public String getCif() { return cif; }
-    public String getDireccion() { return direccion; }
-    public String getTelefono() { return telefono; }
-    public String getEmail() { return email; }
-    public LocalDate getFechaApertura() { return fechaApertura; }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getRazonSocial() {
+        return razonSocial;
+    }
+
+    public String getCif() {
+        return cif;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public LocalDate getFechaApertura() {
+        return fechaApertura;
+    }
 }
