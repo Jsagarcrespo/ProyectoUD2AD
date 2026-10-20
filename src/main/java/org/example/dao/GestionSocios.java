@@ -60,7 +60,7 @@ public class GestionSocios {
 
         socio.validar();
 
-        String sql = "INSERT INTO socios " + "(documento, nombre, apellidos, telefono, edad, email) " + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO socios  (documento, nombre, apellidos, telefono, edad, email)  VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
@@ -81,7 +81,7 @@ public class GestionSocios {
 
         socio.validar();
 
-        String sql = "UPDATE socios SET nombre=?, apellidos=?, " + "telefono=?, edad=?, email=? WHERE documento=?";
+        String sql = "UPDATE socios SET nombre=?, apellidos=?,  telefono=?, edad=?, email=? WHERE documento=?";
 
         try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
@@ -118,7 +118,7 @@ public class GestionSocios {
 
         texto.append("JUEGOS EN PROPIEDAD:\n");
 
-        String sqlJuegos = "SELECT id, nombre, estado " + "FROM juegos WHERE documento_propietario=? " + "ORDER BY nombre";
+        String sqlJuegos = "SELECT id, nombre, estado  FROM juegos WHERE documento_propietario=?  ORDER BY nombre";
 
         try (Connection conexion = DatabaseConnection.conectar()) {
 
@@ -143,7 +143,7 @@ public class GestionSocios {
 
             texto.append("\nPARTIDAS EN LAS QUE PARTICIPA:\n");
 
-            String sqlPartidas = "SELECT p.id, j.nombre, p.fecha, p.hora, i.ganador " + "FROM inscripciones i " + "JOIN partidas p ON i.id_partida=p.id " + "JOIN juegos j ON p.id_juego=j.id " + "WHERE i.documento_socio=? " + "ORDER BY p.fecha DESC, p.hora DESC";
+            String sqlPartidas = "SELECT p.id, j.nombre, p.fecha, p.hora, i.ganador  FROM inscripciones i  JOIN partidas p ON i.id_partida=p.id  JOIN juegos j ON p.id_juego=j.id  WHERE i.documento_socio=?  ORDER BY p.fecha DESC, p.hora DESC";
 
             try (PreparedStatement sentencia = conexion.prepareStatement(sqlPartidas)) {
 
@@ -180,7 +180,7 @@ public class GestionSocios {
 
         List<Socio> socios = new ArrayList<>();
 
-        String sql = "SELECT * FROM socios " + "WHERE nombre LIKE ? OR apellidos LIKE ? " + "ORDER BY apellidos, nombre";
+        String sql = "SELECT * FROM socios  WHERE nombre LIKE ? OR apellidos LIKE ?  ORDER BY apellidos, nombre";
 
         try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
@@ -212,27 +212,27 @@ public class GestionSocios {
         if (opcion == 0) {
 
             // Documento
-            sql = "SELECT * FROM socios " + "WHERE documento LIKE ? " + "ORDER BY apellidos, nombre";
+            sql = "SELECT * FROM socios  WHERE documento LIKE ?  ORDER BY apellidos, nombre";
 
         } else if (opcion == 1) {
 
             // Nombre
-            sql = "SELECT * FROM socios " + "WHERE nombre LIKE ? " + "ORDER BY apellidos, nombre";
+            sql = "SELECT * FROM socios  WHERE nombre LIKE ?  ORDER BY apellidos, nombre";
 
         } else if (opcion == 2) {
 
             // Apellidos
-            sql = "SELECT * FROM socios " + "WHERE apellidos LIKE ? " + "ORDER BY apellidos, nombre";
+            sql = "SELECT * FROM socios  WHERE apellidos LIKE ?  ORDER BY apellidos, nombre";
 
         } else if (opcion == 3) {
 
             // Email
-            sql = "SELECT * FROM socios " + "WHERE email LIKE ? " + "ORDER BY apellidos, nombre";
+            sql = "SELECT * FROM socios  WHERE email LIKE ?  ORDER BY apellidos, nombre";
 
         } else if (opcion == 4) {
 
             // Edad exacta
-            sql = "SELECT * FROM socios " + "WHERE edad=? " + "ORDER BY apellidos, nombre";
+            sql = "SELECT * FROM socios  WHERE edad=?  ORDER BY apellidos, nombre";
 
         } else {
 
@@ -275,7 +275,7 @@ public class GestionSocios {
 
         List<Socio> socios = new ArrayList<>();
 
-        String sql = "SELECT s.* FROM socios s " + "JOIN inscripciones i " + "ON i.documento_socio=s.documento " + "WHERE i.id_partida=? " + "ORDER BY s.apellidos, s.nombre";
+        String sql = "SELECT s.* FROM socios s  JOIN inscripciones i  ON i.documento_socio=s.documento  WHERE i.id_partida=?  ORDER BY s.apellidos, s.nombre";
 
         try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 

@@ -62,7 +62,7 @@ public class GestionJuegos {
 
         juego.validar();
 
-        String sql = "INSERT INTO juegos " + "(nombre, autores, descripcion, min_jugadores, " + "max_jugadores, duracion_min, tematica, tipo, " + "ubicacion, estado, documento_propietario, fecha_alta) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO juegos (nombre, autores, descripcion, min_jugadores, max_jugadores, duracion_min, tematica, tipo, ubicacion, estado, documento_propietario, fecha_alta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -77,13 +77,13 @@ public class GestionJuegos {
 
         juego.validar();
 
-        String sql = "UPDATE juegos SET nombre=?, autores=?, " + "descripcion=?, min_jugadores=?, max_jugadores=?, " + "duracion_min=?, tematica=?, tipo=?, ubicacion=?, " + "estado=?, documento_propietario=?, fecha_alta=? " + "WHERE id=?";
+        String sql = "UPDATE juegos SET nombre=?, autores=?, descripcion=?, min_jugadores=?, max_jugadores=?, duracion_min=?, tematica=?, tipo=?, ubicacion=?, estado=?, documento_propietario=?, fecha_alta=? WHERE id=?";
 
         try (Connection c = DatabaseConnection.conectar()) {
 
             // Comprobar que las partidas existentes
             // admiten el nuevo numero de jugadores
-            String consulta = "SELECT COUNT(*) FROM partidas " + "WHERE id_juego=? AND estado<>'cancelada' " + "AND (jugadores_deseados<? " + "OR jugadores_deseados>?)";
+            String consulta = "SELECT COUNT(*) FROM partidas WHERE id_juego=? AND estado<>'cancelada' AND (jugadores_deseados<? OR jugadores_deseados>?)";
 
             try (PreparedStatement comprobacion = c.prepareStatement(consulta)) {
 
@@ -95,7 +95,7 @@ public class GestionJuegos {
 
                     if (r.next() && r.getInt(1) > 0) {
 
-                        throw new IllegalArgumentException("El rango de jugadores no sirve " + "para algunas partidas existentes");
+                        throw new IllegalArgumentException("El rango de jugadores no sirve para algunas partidas existentes");
                     }
                 }
             }
@@ -155,7 +155,7 @@ public class GestionJuegos {
     // LISTADO CON PROPIETARIOS
     public static String listadoConPropietarios() throws SQLException {
 
-        String sql = "SELECT j.id, j.nombre, j.estado, " + "CASE WHEN s.documento IS NULL " + "THEN 'Asociacion' " + "ELSE CONCAT(s.nombre, ' ', s.apellidos) " + "END AS propietario " + "FROM juegos j " + "LEFT JOIN socios s " + "ON j.documento_propietario=s.documento " + "ORDER BY j.nombre";
+        String sql = "SELECT j.id, j.nombre, j.estado, CASE WHEN s.documento IS NULL THEN 'Asociacion' ELSE CONCAT(s.nombre, ' ', s.apellidos) END AS propietario FROM juegos j LEFT JOIN socios s ON j.documento_propietario=s.documento ORDER BY j.nombre";
 
         StringBuilder texto = new StringBuilder();
 
@@ -176,7 +176,7 @@ public class GestionJuegos {
 
         List<Juego> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM juegos " + "WHERE nombre LIKE ? ORDER BY nombre";
+        String sql = "SELECT * FROM juegos WHERE nombre LIKE ? ORDER BY nombre";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -199,7 +199,7 @@ public class GestionJuegos {
 
         List<Juego> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM juegos " + "WHERE nombre LIKE ? OR autores LIKE ? " + "ORDER BY nombre";
+        String sql = "SELECT * FROM juegos WHERE nombre LIKE ? OR autores LIKE ? ORDER BY nombre";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -248,7 +248,7 @@ public class GestionJuegos {
 
         List<Juego> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM juegos " + "WHERE min_jugadores <= ? " + "AND max_jugadores >= ? " + "ORDER BY nombre";
+        String sql = "SELECT * FROM juegos WHERE min_jugadores <= ? AND max_jugadores >= ? ORDER BY nombre";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -272,7 +272,7 @@ public class GestionJuegos {
 
         List<Juego> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM juegos " + "WHERE estado=? ORDER BY nombre";
+        String sql = "SELECT * FROM juegos WHERE estado=? ORDER BY nombre";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -295,7 +295,7 @@ public class GestionJuegos {
 
         List<Juego> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM juegos " + "WHERE documento_propietario=? ORDER BY nombre";
+        String sql = "SELECT * FROM juegos WHERE documento_propietario=? ORDER BY nombre";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -318,7 +318,7 @@ public class GestionJuegos {
 
         List<Juego> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM juegos " + "WHERE documento_propietario IS NULL " + "ORDER BY nombre";
+        String sql = "SELECT * FROM juegos WHERE documento_propietario IS NULL ORDER BY nombre";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql); ResultSet r = p.executeQuery()) {
 
