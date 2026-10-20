@@ -48,8 +48,8 @@ public class VentanaPrincipal extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                // Pendiente de crear VentanaSocios
-                JOptionPane.showMessageDialog(VentanaPrincipal.this, "Ventana de socios pendiente de crear");
+                VentanaSocios ventana = new VentanaSocios();
+                ventana.setVisible(true);
             }
         });
 
@@ -58,9 +58,8 @@ public class VentanaPrincipal extends JFrame {
         partidasButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                // Pendiente de crear VentanaPartidas
-                JOptionPane.showMessageDialog(VentanaPrincipal.this, "Ventana de partidas pendiente de crear");
+                VentanaPartidas ventana = new VentanaPartidas();
+                ventana.setVisible(true);
             }
         });
 
@@ -70,8 +69,10 @@ public class VentanaPrincipal extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                // Pendiente de crear VentanaInscripciones
-                JOptionPane.showMessageDialog(VentanaPrincipal.this, "Ventana de inscripciones pendiente de crear");
+
+                VentanaInscripciones ventana = new VentanaInscripciones();
+                ventana.setVisible(true);
+
             }
         });
 
@@ -81,23 +82,10 @@ public class VentanaPrincipal extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                try {
 
-                    Asociacion asociacion = GestionAsociacion.obtener();
+                VentanaAsociacion ventana = new VentanaAsociacion();
+                ventana.setVisible(true);
 
-                    if (asociacion != null) {
-
-                        JOptionPane.showMessageDialog(VentanaPrincipal.this, "Nombre: " + asociacion.getRazonSocial() + "\nCIF: " + asociacion.getCif() + "\nDireccion: " + asociacion.getDireccion() + "\nTelefono: " + asociacion.getTelefono() + "\nEmail: " + asociacion.getEmail() + "\nFecha apertura: " + asociacion.getFechaApertura());
-
-                    } else {
-
-                        JOptionPane.showMessageDialog(VentanaPrincipal.this, "No se han encontrado datos de la asociacion");
-                    }
-
-                } catch (SQLException ex) {
-
-                    JOptionPane.showMessageDialog(VentanaPrincipal.this, "Error al consultar la asociacion: " + ex.getMessage());
-                }
             }
         });
 
