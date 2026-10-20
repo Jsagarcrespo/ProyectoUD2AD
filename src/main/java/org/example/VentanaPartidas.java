@@ -1,7 +1,9 @@
 package org.example;
 
 import org.example.dao.GestionPartidas;
+import org.example.dao.GestionJuegos;
 import org.example.models.Partida;
+import org.example.models.Juego;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -36,22 +38,26 @@ public class VentanaPartidas extends JFrame {
 
     private JPanel VentanaPartidas;
 
+    // Nuevo ComboBox del buscador
+    private JComboBox TipoBusquedaPartidas;
+
 
     public VentanaPartidas() {
 
         setTitle("Gestion de Partidas");
         setContentPane(VentanaPartidas);
-        setSize(800, 600);
+        setSize(850, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // El ID lo genera MariaDB
         IDPartidaTextField.setEditable(false);
-
         Lista.setEditable(false);
 
         Fecha.setText(LocalDate.now().toString());
         Estado.setText("programada");
+
+        // Opciones del buscador avanzado
+        TipoBusquedaPartidas.setModel(new DefaultComboBoxModel<>(new String[]{"ID de partida", "Nombre del juego", "ID del juego", "Fecha", "Estado"}));
 
         mostrarPartidas();
 
@@ -137,8 +143,7 @@ public class VentanaPartidas extends JFrame {
         });
 
 
-        // Al pulsar una partida del listado
-        // carga sus datos, como en UD1
+        // Seleccionar una partida pulsando en el listado
         Lista.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -146,7 +151,6 @@ public class VentanaPartidas extends JFrame {
                 try {
 
                     int posicion = Lista.viewToModel2D(e.getPoint());
-
                     int linea = Lista.getLineOfOffset(posicion);
 
                     int inicio = Lista.getLineStartOffset(linea);
@@ -177,7 +181,7 @@ public class VentanaPartidas extends JFrame {
     }
 
 
-    // Rellena los campos con una partida
+    // RELLENAR CAMPOS
     public void rellenarCampos(Partida partida) {
 
         IDPartidaTextField.setText(String.valueOf(partida.getId()));
@@ -185,7 +189,6 @@ public class VentanaPartidas extends JFrame {
         IDJuegoTextField.setText(String.valueOf(partida.getIdJuego()));
 
         Fecha.setText(partida.getFecha().toString());
-
         Hora.setText(partida.getHora().toString());
 
         JugadoresDeseados.setText(String.valueOf(partida.getJugadoresDeseados()));
@@ -194,7 +197,7 @@ public class VentanaPartidas extends JFrame {
     }
 
 
-    // Recoge los datos y crea un objeto Partida
+    // LEER DATOS DEL FORMULARIO
     public Partida leerPartida(int id) {
 
         int idJuego = Integer.parseInt(IDJuegoTextField.getText().trim());
@@ -216,7 +219,6 @@ public class VentanaPartidas extends JFrame {
 
         try {
 
-            // El ID es 0 porque MariaDB lo genera
             Partida partida = leerPartida(0);
 
             GestionPartidas.anadir(partida);
@@ -430,10 +432,10 @@ public class VentanaPartidas extends JFrame {
     }
 
 
-    // BUSCAR PARTIDAS
+    // NUEVO: BUSQUEDA AVANZADA DE PARTIDAS
     public void buscarPartida() {
 
-        String busqueda = Buscar.getText().trim().toLowerCase();
+        String busqueda = Buscar.getText().trim();
 
         if (busqueda.isEmpty()) {
             mostrarPartidas();
@@ -442,26 +444,29 @@ public class VentanaPartidas extends JFrame {
 
         try {
 
-            List<Partida> partidas = GestionPartidas.listar();
+            // Opcion del ComboBox
+            int opcion = TipoBusquedaPartidas.getSelectedIndex();
 
-            Lista.setText("");
+            // Buscar en MariaDB
+            List<Partida> partidas = GestionPartidas.buscarAvanzado(opcion, busqueda);
 
-            for (Partida partida : partidas) {
+            mostrarListado(partidas, "No se han encontrado partidas");
 
-                // Busca por ID, juego, fecha o estado
-                if (String.valueOf(partida.getId()).equals(busqueda) || String.valueOf(partida.getIdJuego()).equals(busqueda) || partida.getFecha().toString().equals(busqueda) || partida.getEstado().contains(busqueda)) {
+        } catch (NumberFormatException e) {
 
-                    Lista.append("ID: " + partida.getId() + " | Juego: " + partida.getIdJuego() + " | Fecha: " + partida.getFecha() + " | Hora: " + partida.getHora() + " | Libres: " + GestionPartidas.plazasLibres(partida.getId()) + " | Estado: " + partida.getEstado() + "\n");
-                }
-            }
+            JOptionPane.showMessageDialog(this, "Introduce un numero entero para buscar por ID");
 
-            if (Lista.getText().isEmpty()) {
-                Lista.setText("No se han encontrado partidas");
-            }
+        } catch (DateTimeParseException e) {
+
+            JOptionPane.showMessageDialog(this, "Fecha incorrecta. Utiliza AAAA-MM-DD");
+
+        } catch (IllegalArgumentException e) {
+
+            JOptionPane.showMessageDialog(this, e.getMessage());
 
         } catch (SQLException e) {
 
-            JOptionPane.showMessageDialog(this, "Error al buscar: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al buscar partidas: " + e.getMessage());
         }
     }
 
@@ -473,22 +478,40 @@ public class VentanaPartidas extends JFrame {
 
             List<Partida> partidas = GestionPartidas.listar();
 
-            Lista.setText("");
-
-            if (partidas.isEmpty()) {
-
-                Lista.setText("No hay partidas guardadas");
-                return;
-            }
-
-            for (Partida partida : partidas) {
-
-                Lista.append("ID: " + partida.getId() + " | Juego: " + partida.getIdJuego() + " | Fecha: " + partida.getFecha() + " | Hora: " + partida.getHora() + " | Libres: " + GestionPartidas.plazasLibres(partida.getId()) + " | Estado: " + partida.getEstado() + "\n");
-            }
+            mostrarListado(partidas, "No hay partidas guardadas");
 
         } catch (SQLException e) {
 
             JOptionPane.showMessageDialog(this, "Error al mostrar partidas: " + e.getMessage());
+        }
+    }
+
+
+    // Muestra los resultados de las busquedas y el listado
+    private void mostrarListado(List<Partida> partidas, String mensajeVacio) throws SQLException {
+
+        Lista.setText("");
+
+        if (partidas.isEmpty()) {
+
+            Lista.setText(mensajeVacio);
+            return;
+        }
+
+        for (Partida partida : partidas) {
+
+            // Obtener el nombre real del juego
+            Juego juego = GestionJuegos.buscar(partida.getIdJuego());
+
+            String nombreJuego = "Desconocido";
+
+            if (juego != null) {
+                nombreJuego = juego.getNombre();
+            }
+
+            int libres = GestionPartidas.plazasLibres(partida.getId());
+
+            Lista.append("ID: " + partida.getId() + " | Juego: " + nombreJuego + " (ID " + partida.getIdJuego() + ")" + " | Fecha: " + partida.getFecha() + " | Hora: " + partida.getHora() + " | Libres: " + libres + " | Estado: " + partida.getEstado() + "\n");
         }
     }
 
@@ -503,5 +526,7 @@ public class VentanaPartidas extends JFrame {
         JugadoresDeseados.setText("");
         Estado.setText("programada");
         Buscar.setText("");
+
+        TipoBusquedaPartidas.setSelectedIndex(0);
     }
 }

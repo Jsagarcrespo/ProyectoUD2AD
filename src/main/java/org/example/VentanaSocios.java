@@ -32,6 +32,9 @@ public class VentanaSocios extends JFrame {
 
     private JPanel VentanaSocios;
 
+    // Nuevo JComboBox
+    private JComboBox<String> TipoBusquedaSocios;
+
 
     public VentanaSocios() {
 
@@ -43,9 +46,13 @@ public class VentanaSocios extends JFrame {
 
         textArea1.setEditable(false);
 
+        // Configurar las opciones del nuevo ComboBox
+        TipoBusquedaSocios.setModel(new DefaultComboBoxModel<>(new String[]{"DNI", "Nombre", "Apellidos", "Email", "Edad"}));
+
         mostrarSocios();
 
 
+        // AÑADIR
         añadirButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -54,6 +61,7 @@ public class VentanaSocios extends JFrame {
         });
 
 
+        // MODIFICAR
         modificarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -62,6 +70,7 @@ public class VentanaSocios extends JFrame {
         });
 
 
+        // ELIMINAR
         eliminarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -70,6 +79,7 @@ public class VentanaSocios extends JFrame {
         });
 
 
+        // BUSCAR
         buscarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -78,6 +88,7 @@ public class VentanaSocios extends JFrame {
         });
 
 
+        // MOSTRAR TODOS
         mostrarTodosButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -86,6 +97,7 @@ public class VentanaSocios extends JFrame {
         });
 
 
+        // VER HISTORIAL
         verHistorialButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -94,6 +106,7 @@ public class VentanaSocios extends JFrame {
         });
 
 
+        // LIMPIAR
         limpiarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -102,6 +115,7 @@ public class VentanaSocios extends JFrame {
         });
 
 
+        // CERRAR
         cerrarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -110,8 +124,7 @@ public class VentanaSocios extends JFrame {
         });
 
 
-        // Seleccionar un socio pulsando sobre el listado
-        // Como en VentanaLibros de UD1
+        // Selecciona un socio pulsando sobre el listado
         textArea1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -147,7 +160,7 @@ public class VentanaSocios extends JFrame {
     }
 
 
-    // Rellena los campos del socio seleccionado
+    // RELLENAR CAMPOS
     public void rellenarCampos(Socio socio) {
 
         Documento.setText(socio.getDocumento());
@@ -163,12 +176,11 @@ public class VentanaSocios extends JFrame {
         Edad.setText(String.valueOf(socio.getEdad()));
         Email.setText(socio.getEmail());
 
-        // El documento identifica al socio
         Documento.setEditable(false);
     }
 
 
-    // Recoge los datos de los JTextField
+    // LEER DATOS DEL SOCIO
     public Socio leerSocio() {
 
         String documento = Documento.getText().trim();
@@ -306,7 +318,7 @@ public class VentanaSocios extends JFrame {
     }
 
 
-    // BUSCAR SOCIO
+    // NUEVO: BUSQUEDA AVANZADA DE SOCIOS
     public void buscarSocio() {
 
         String busqueda = Buscar.getText().trim();
@@ -318,34 +330,35 @@ public class VentanaSocios extends JFrame {
 
         try {
 
+            // Obtener la opcion seleccionada
+            int opcion = TipoBusquedaSocios.getSelectedIndex();
+
+            // Buscar en MariaDB utilizando nuestro DAO
+            List<Socio> socios = GestionSocios.buscarAvanzado(opcion, busqueda);
+
             textArea1.setText("");
 
-            // Buscar primero por documento
-            Socio socio = GestionSocios.buscar(busqueda);
-
-            if (socio != null) {
+            for (Socio socio : socios) {
 
                 textArea1.append("Documento: " + socio.getDocumento() + " | Nombre: " + socio.getNombre() + " " + socio.getApellidos() + " | Edad: " + socio.getEdad() + " | Email: " + socio.getEmail() + "\n");
-
-            } else {
-
-                // Buscar por nombre o apellidos
-                List<Socio> socios = GestionSocios.buscarPorNombre(busqueda);
-
-                for (Socio s : socios) {
-
-                    textArea1.append("Documento: " + s.getDocumento() + " | Nombre: " + s.getNombre() + " " + s.getApellidos() + " | Edad: " + s.getEdad() + " | Email: " + s.getEmail() + "\n");
-                }
             }
 
-            if (textArea1.getText().isEmpty()) {
+            if (socios.isEmpty()) {
 
                 textArea1.setText("No se han encontrado socios");
             }
 
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(this, "Para buscar por edad introduce un numero entero");
+
+        } catch (IllegalArgumentException e) {
+
+            JOptionPane.showMessageDialog(this, e.getMessage());
+
         } catch (SQLException e) {
 
-            JOptionPane.showMessageDialog(this, "Error al buscar: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al buscar socios: " + e.getMessage());
         }
     }
 
@@ -401,6 +414,7 @@ public class VentanaSocios extends JFrame {
             String historial = GestionSocios.historial(documento);
 
             JTextArea texto = new JTextArea(historial, 15, 50);
+
             texto.setEditable(false);
 
             JScrollPane scroll = new JScrollPane(texto);
@@ -425,7 +439,9 @@ public class VentanaSocios extends JFrame {
         Email.setText("");
         Buscar.setText("");
 
-        // Permite introducir otro socio
         Documento.setEditable(true);
+
+        // Reiniciar el nuevo ComboBox
+        TipoBusquedaSocios.setSelectedIndex(0);
     }
 }

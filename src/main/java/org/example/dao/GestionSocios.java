@@ -15,7 +15,8 @@ public class GestionSocios {
         return new Socio(resultado.getString("documento"), resultado.getString("nombre"), resultado.getString("apellidos"), resultado.getString("telefono"), resultado.getInt("edad"), resultado.getString("email"));
     }
 
-    // Muestra todos los socios
+
+    // MUESTRA TODOS LOS SOCIOS
     public static List<Socio> listar() throws SQLException {
 
         List<Socio> socios = new ArrayList<>();
@@ -32,7 +33,8 @@ public class GestionSocios {
         return socios;
     }
 
-    // Busca un socio por su documento
+
+    // BUSCA POR DOCUMENTO EXACTO
     public static Socio buscar(String documento) throws SQLException {
 
         String sql = "SELECT * FROM socios WHERE documento=?";
@@ -52,7 +54,8 @@ public class GestionSocios {
         return null;
     }
 
-    // Añade un socio nuevo
+
+    // AÑADE UN SOCIO
     public static void anadir(Socio socio) throws SQLException {
 
         socio.validar();
@@ -72,7 +75,8 @@ public class GestionSocios {
         }
     }
 
-    // Modifica un socio
+
+    // MODIFICA UN SOCIO
     public static boolean modificar(Socio socio) throws SQLException {
 
         socio.validar();
@@ -92,7 +96,8 @@ public class GestionSocios {
         }
     }
 
-    // Elimina un socio
+
+    // ELIMINA UN SOCIO
     public static boolean eliminar(String documento) throws SQLException {
 
         String sql = "DELETE FROM socios WHERE documento=?";
@@ -105,14 +110,15 @@ public class GestionSocios {
         }
     }
 
-    // Consulta los juegos y partidas de un socio
+
+    // HISTORIAL DE JUEGOS Y PARTIDAS DE UN SOCIO
     public static String historial(String documento) throws SQLException {
 
         StringBuilder texto = new StringBuilder();
 
         texto.append("JUEGOS EN PROPIEDAD:\n");
 
-        String sqlJuegos = "SELECT id, nombre, estado FROM juegos WHERE documento_propietario=? ORDER BY nombre";
+        String sqlJuegos = "SELECT id, nombre, estado " + "FROM juegos WHERE documento_propietario=? " + "ORDER BY nombre";
 
         try (Connection conexion = DatabaseConnection.conectar()) {
 
@@ -137,7 +143,7 @@ public class GestionSocios {
 
             texto.append("\nPARTIDAS EN LAS QUE PARTICIPA:\n");
 
-            String sqlPartidas = "SELECT p.id, j.nombre, p.fecha, p.hora, i.ganador FROM inscripciones i JOIN partidas p ON i.id_partida=p.id JOIN juegos j ON p.id_juego=j.id WHERE i.documento_socio=? ORDER BY p.fecha DESC, p.hora DESC";
+            String sqlPartidas = "SELECT p.id, j.nombre, p.fecha, p.hora, i.ganador " + "FROM inscripciones i " + "JOIN partidas p ON i.id_partida=p.id " + "JOIN juegos j ON p.id_juego=j.id " + "WHERE i.documento_socio=? " + "ORDER BY p.fecha DESC, p.hora DESC";
 
             try (PreparedStatement sentencia = conexion.prepareStatement(sqlPartidas)) {
 
@@ -168,12 +174,13 @@ public class GestionSocios {
         return texto.toString();
     }
 
-    // Busca socios por nombre o apellidos
+
+    // BUSCAR POR NOMBRE O APELLIDOS
     public static List<Socio> buscarPorNombre(String nombre) throws SQLException {
 
         List<Socio> socios = new ArrayList<>();
 
-        String sql = "SELECT * FROM socios WHERE nombre LIKE ? OR apellidos LIKE ? ORDER BY apellidos, nombre";
+        String sql = "SELECT * FROM socios " + "WHERE nombre LIKE ? OR apellidos LIKE ? " + "ORDER BY apellidos, nombre";
 
         try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
@@ -193,12 +200,82 @@ public class GestionSocios {
         return socios;
     }
 
-    // Consulta los socios inscritos en una partida
+
+    // NUEVO: BUSQUEDA AVANZADA DE SOCIOS
+    public static List<Socio> buscarAvanzado(int opcion, String busqueda) throws SQLException {
+
+        List<Socio> socios = new ArrayList<>();
+
+        String sql;
+
+        // Seleccionamos la consulta segun el ComboBox
+        if (opcion == 0) {
+
+            // Documento
+            sql = "SELECT * FROM socios " + "WHERE documento LIKE ? " + "ORDER BY apellidos, nombre";
+
+        } else if (opcion == 1) {
+
+            // Nombre
+            sql = "SELECT * FROM socios " + "WHERE nombre LIKE ? " + "ORDER BY apellidos, nombre";
+
+        } else if (opcion == 2) {
+
+            // Apellidos
+            sql = "SELECT * FROM socios " + "WHERE apellidos LIKE ? " + "ORDER BY apellidos, nombre";
+
+        } else if (opcion == 3) {
+
+            // Email
+            sql = "SELECT * FROM socios " + "WHERE email LIKE ? " + "ORDER BY apellidos, nombre";
+
+        } else if (opcion == 4) {
+
+            // Edad exacta
+            sql = "SELECT * FROM socios " + "WHERE edad=? " + "ORDER BY apellidos, nombre";
+
+        } else {
+
+            throw new IllegalArgumentException("Tipo de busqueda incorrecto");
+        }
+
+
+        try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+
+            if (opcion == 4) {
+
+                int edad = Integer.parseInt(busqueda.trim());
+
+                if (edad < 0) {
+                    throw new IllegalArgumentException("La edad no puede ser negativa");
+                }
+
+                sentencia.setInt(1, edad);
+
+            } else {
+
+                // Permite coincidencias parciales
+                sentencia.setString(1, "%" + busqueda.trim() + "%");
+            }
+
+            try (ResultSet resultado = sentencia.executeQuery()) {
+
+                while (resultado.next()) {
+                    socios.add(convertir(resultado));
+                }
+            }
+        }
+
+        return socios;
+    }
+
+
+    // CONSULTAR SOCIOS INSCRITOS EN UNA PARTIDA
     public static List<Socio> listarPorPartida(int idPartida) throws SQLException {
 
         List<Socio> socios = new ArrayList<>();
 
-        String sql = "SELECT s.* FROM socios s JOIN inscripciones i ON i.documento_socio=s.documento " + "WHERE i.id_partida=? " + "ORDER BY s.apellidos, s.nombre";
+        String sql = "SELECT s.* FROM socios s " + "JOIN inscripciones i " + "ON i.documento_socio=s.documento " + "WHERE i.id_partida=? " + "ORDER BY s.apellidos, s.nombre";
 
         try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
