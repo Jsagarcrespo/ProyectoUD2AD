@@ -12,15 +12,20 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.ArrayList;
 
 public class VentanaPartidas extends JFrame {
 
     private JTextField IDPartidaTextField;
-    private JTextField IDJuegoTextField;
     private JTextField Fecha;
     private JTextField Hora;
     private JTextField JugadoresDeseados;
-    private JTextField Estado;
+
+    private JComboBox<String> ComboJuegos;
+    private JComboBox<String> ComboEstado;
+
+    // Lista para saber el ID del juego seleccionado
+    private List<Juego> juegosDelCombo = new ArrayList<>();
 
     private JButton añadirButton;
     private JButton modificarButton;
@@ -37,8 +42,6 @@ public class VentanaPartidas extends JFrame {
     private JButton cerrarButton;
 
     private JPanel VentanaPartidas;
-
-    // Nuevo ComboBox del buscador
     private JComboBox TipoBusquedaPartidas;
 
 
@@ -54,9 +57,14 @@ public class VentanaPartidas extends JFrame {
         Lista.setEditable(false);
 
         Fecha.setText(LocalDate.now().toString());
-        Estado.setText("programada");
 
-        // Opciones del buscador avanzado
+        // Estados disponibles
+        ComboEstado.setModel(new DefaultComboBoxModel<>(new String[]{"programada", "finalizada", "cancelada"}));
+
+        // Cargar juegos desde la base de datos
+        cargarJuegos();
+
+        // Opciones para buscar
         TipoBusquedaPartidas.setModel(new DefaultComboBoxModel<>(new String[]{"ID de partida", "Nombre del juego", "ID del juego", "Fecha", "Estado"}));
 
         mostrarPartidas();
@@ -186,21 +194,39 @@ public class VentanaPartidas extends JFrame {
 
         IDPartidaTextField.setText(String.valueOf(partida.getId()));
 
-        IDJuegoTextField.setText(String.valueOf(partida.getIdJuego()));
+        // Seleccionar el juego correspondiente
+        for (int i = 0; i < juegosDelCombo.size(); i++) {
+
+            if (juegosDelCombo.get(i).getId() == partida.getIdJuego()) {
+
+                ComboJuegos.setSelectedIndex(i + 1);
+                break;
+            }
+        }
 
         Fecha.setText(partida.getFecha().toString());
         Hora.setText(partida.getHora().toString());
 
         JugadoresDeseados.setText(String.valueOf(partida.getJugadoresDeseados()));
 
-        Estado.setText(partida.getEstado());
+        ComboEstado.setSelectedItem(partida.getEstado());
     }
 
 
     // LEER DATOS DEL FORMULARIO
     public Partida leerPartida(int id) {
 
-        int idJuego = Integer.parseInt(IDJuegoTextField.getText().trim());
+        int posicion = ComboJuegos.getSelectedIndex();
+
+        if (posicion <= 0 || posicion > juegosDelCombo.size()) {
+
+            throw new IllegalArgumentException("Selecciona un juego de la lista");
+        }
+
+        // Obtenemos el ID sin necesitar un JTextField
+        Juego juego = juegosDelCombo.get(posicion - 1);
+
+        int idJuego = juego.getId();
 
         LocalDate fecha = LocalDate.parse(Fecha.getText().trim());
 
@@ -208,7 +234,7 @@ public class VentanaPartidas extends JFrame {
 
         int jugadores = Integer.parseInt(JugadoresDeseados.getText().trim());
 
-        String estado = Estado.getText().trim().toLowerCase();
+        String estado = ComboEstado.getSelectedItem().toString();
 
         return new Partida(id, idJuego, fecha, hora, jugadores, estado);
     }
@@ -230,7 +256,7 @@ public class VentanaPartidas extends JFrame {
 
         } catch (NumberFormatException e) {
 
-            JOptionPane.showMessageDialog(this, "ID Juego y jugadores deseados deben ser numeros");
+            JOptionPane.showMessageDialog(this, "Los jugadores deseados deben ser un numero");
 
         } catch (DateTimeParseException e) {
 
@@ -432,7 +458,7 @@ public class VentanaPartidas extends JFrame {
     }
 
 
-    // NUEVO: BUSQUEDA AVANZADA DE PARTIDAS
+    // BUSQUEDA AVANZADA DE PARTIDAS
     public void buscarPartida() {
 
         String busqueda = Buscar.getText().trim();
@@ -444,10 +470,8 @@ public class VentanaPartidas extends JFrame {
 
         try {
 
-            // Opcion del ComboBox
             int opcion = TipoBusquedaPartidas.getSelectedIndex();
 
-            // Buscar en MariaDB
             List<Partida> partidas = GestionPartidas.buscarAvanzado(opcion, busqueda);
 
             mostrarListado(partidas, "No se han encontrado partidas");
@@ -487,7 +511,7 @@ public class VentanaPartidas extends JFrame {
     }
 
 
-    // Muestra los resultados de las busquedas y el listado
+    // MOSTRAR LISTADO
     private void mostrarListado(List<Partida> partidas, String mensajeVacio) throws SQLException {
 
         Lista.setText("");
@@ -500,7 +524,6 @@ public class VentanaPartidas extends JFrame {
 
         for (Partida partida : partidas) {
 
-            // Obtener el nombre real del juego
             Juego juego = GestionJuegos.buscar(partida.getIdJuego());
 
             String nombreJuego = "Desconocido";
@@ -520,13 +543,37 @@ public class VentanaPartidas extends JFrame {
     public void limpiarCampos() {
 
         IDPartidaTextField.setText("");
-        IDJuegoTextField.setText("");
         Fecha.setText(LocalDate.now().toString());
         Hora.setText("");
         JugadoresDeseados.setText("");
-        Estado.setText("programada");
         Buscar.setText("");
 
+        ComboEstado.setSelectedIndex(0);
+        ComboJuegos.setSelectedIndex(0);
         TipoBusquedaPartidas.setSelectedIndex(0);
+    }
+
+
+    // CARGAR JUEGOS EN EL COMBOBOX
+    public void cargarJuegos() {
+
+        try {
+
+            juegosDelCombo = GestionJuegos.listar();
+
+            ComboJuegos.removeAllItems();
+            ComboJuegos.addItem("Selecciona un juego");
+
+            for (Juego juego : juegosDelCombo) {
+
+                ComboJuegos.addItem(juego.getNombre() + " (ID " + juego.getId() + ")");
+            }
+
+            ComboJuegos.setSelectedIndex(0);
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(this, "Error al cargar juegos: " + e.getMessage());
+        }
     }
 }

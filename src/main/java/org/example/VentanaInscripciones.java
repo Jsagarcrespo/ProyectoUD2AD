@@ -2,12 +2,18 @@ package org.example;
 
 import org.example.dao.GestionInscripciones;
 import org.example.dao.GestionPartidas;
+import org.example.dao.GestionJuegos;
+import org.example.dao.GestionSocios;
 import org.example.models.Inscripcion;
+import org.example.models.Partida;
+import org.example.models.Juego;
+import org.example.models.Socio;
 
 import javax.swing.*;
 import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.ArrayList;
 
 public class VentanaInscripciones extends JFrame {
 
@@ -34,6 +40,14 @@ public class VentanaInscripciones extends JFrame {
     // NUEVO: ComboBox de busquedas
     private JComboBox TipoBusquedaInscripciones;
 
+    private JComboBox<String> ComboPartidas;
+    private JComboBox<String> ComboSocios;
+    private JLabel PlazasLibresLabel;
+
+    // Las listas guardan los objetos que se muestran en los ComboBox
+    private List<Partida> partidasCombo = new ArrayList<>();
+    private List<Socio> sociosCombo = new ArrayList<>();
+
 
     public VentanaInscripciones() {
 
@@ -50,6 +64,62 @@ public class VentanaInscripciones extends JFrame {
         TipoBusquedaInscripciones.setModel(new DefaultComboBoxModel<>(new String[]{"ID de partida", "Documento del socio", "Nombre del socio", "Nombre del invitado", "Ganadores", "ID de inscripcion"}));
 
         Lista.setText("Introduce un ID de partida para ver sus participantes");
+
+        // Cargar las opciones desde MariaDB
+        cargarPartidas();
+        cargarSocios();
+
+        // Al elegir una partida, se rellena el ID automaticamente
+        ComboPartidas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int posicion = ComboPartidas.getSelectedIndex() - 1;
+
+                IdInscripcion.setText("");
+
+                if (posicion >= 0 && posicion < partidasCombo.size()) {
+
+                    Partida partida = partidasCombo.get(posicion);
+                    IDPartida.setText(String.valueOf(partida.getId()));
+                    TipoBusquedaInscripciones.setSelectedIndex(0);
+                    Buscador.setText(String.valueOf(partida.getId()));
+                    mostrarParticipantes();
+
+                } else {
+
+                    IDPartida.setText("");
+                    PlazasLibresLabel.setText("Plazas libres: -");
+                }
+            }
+        });
+
+        // Al elegir un socio, se rellena su documento automaticamente
+        ComboSocios.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int posicion = ComboSocios.getSelectedIndex() - 1;
+
+                if (posicion >= 0 && posicion < sociosCombo.size()) {
+
+                    Socio.setText(sociosCombo.get(posicion).getDocumento());
+                    Invitado.setText("");
+
+                } else {
+
+                    Socio.setText("");
+                }
+            }
+        });
+
+        // Si vamos a escribir un invitado, quitamos el socio seleccionado
+        Invitado.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                ComboSocios.setSelectedIndex(0);
+            }
+        });
 
 
         // INSCRIBIR SOCIO
@@ -172,22 +242,38 @@ public class VentanaInscripciones extends JFrame {
     // RELLENAR CAMPOS
     public void rellenarCampos(Inscripcion inscripcion) {
 
-        IdInscripcion.setText(String.valueOf(inscripcion.getId()));
+        // Seleccionar la partida en el desplegable
+        for (int i = 0; i < partidasCombo.size(); i++) {
+            if (partidasCombo.get(i).getId() == inscripcion.getIdPartida()) {
+                ComboPartidas.setSelectedIndex(i + 1);
+                break;
+            }
+        }
 
         IDPartida.setText(String.valueOf(inscripcion.getIdPartida()));
 
         if (inscripcion.getDocumentoSocio() != null) {
 
             Socio.setText(inscripcion.getDocumentoSocio());
-
             Invitado.setText("");
+
+            // Seleccionar el socio en el desplegable
+            for (int i = 0; i < sociosCombo.size(); i++) {
+                if (sociosCombo.get(i).getDocumento().equals(inscripcion.getDocumentoSocio())) {
+                    ComboSocios.setSelectedIndex(i + 1);
+                    break;
+                }
+            }
 
         } else {
 
+            ComboSocios.setSelectedIndex(0);
             Socio.setText("");
-
             Invitado.setText(inscripcion.getNombreInvitado());
         }
+
+        // Al final, para que no se borre al cambiar de partida
+        IdInscripcion.setText(String.valueOf(inscripcion.getId()));
     }
 
 
@@ -216,12 +302,7 @@ public class VentanaInscripciones extends JFrame {
 
             JOptionPane.showMessageDialog(this, "Socio inscrito correctamente");
 
-            limpiarCampos();
-
-            // Mostrar participantes de esa partida
-            TipoBusquedaInscripciones.setSelectedIndex(0);
-            Buscador.setText(String.valueOf(partida));
-            mostrarParticipantes();
+            mostrarPartidaDespuesCambio(partida);
 
         } catch (NumberFormatException e) {
 
@@ -263,11 +344,7 @@ public class VentanaInscripciones extends JFrame {
 
             JOptionPane.showMessageDialog(this, "Invitado inscrito correctamente");
 
-            limpiarCampos();
-
-            TipoBusquedaInscripciones.setSelectedIndex(0);
-            Buscador.setText(String.valueOf(partida));
-            mostrarParticipantes();
+            mostrarPartidaDespuesCambio(partida);
 
         } catch (NumberFormatException e) {
 
@@ -307,11 +384,7 @@ public class VentanaInscripciones extends JFrame {
 
                     JOptionPane.showMessageDialog(this, "Inscripcion eliminada correctamente");
 
-                    limpiarCampos();
-
-                    TipoBusquedaInscripciones.setSelectedIndex(0);
-                    Buscador.setText(String.valueOf(partida));
-                    mostrarParticipantes();
+                    mostrarPartidaDespuesCambio(partida);
 
                 } else {
 
@@ -356,11 +429,7 @@ public class VentanaInscripciones extends JFrame {
                     JOptionPane.showMessageDialog(this, "Ganador desmarcado correctamente");
                 }
 
-                limpiarCampos();
-
-                TipoBusquedaInscripciones.setSelectedIndex(0);
-                Buscador.setText(String.valueOf(partida));
-                mostrarParticipantes();
+                mostrarPartidaDespuesCambio(partida);
 
             } else {
 
@@ -425,6 +494,9 @@ public class VentanaInscripciones extends JFrame {
 
                 Lista.append("\nPlazas libres: " + libres);
 
+                Partida datosPartida = GestionPartidas.buscar(partida);
+                PlazasLibresLabel.setText("Plazas libres: " + libres + " de " + datosPartida.getJugadoresDeseados() + " (" + datosPartida.getEstado() + ")");
+
                 // Facilitar nuevas inscripciones
                 IDPartida.setText(String.valueOf(partida));
             }
@@ -480,6 +552,76 @@ public class VentanaInscripciones extends JFrame {
     }
 
 
+    // CARGAR PARTIDAS EN EL COMBOBOX
+    private void cargarPartidas() {
+
+        try {
+
+            partidasCombo = GestionPartidas.listar();
+
+            ComboPartidas.removeAllItems();
+            ComboPartidas.addItem("Selecciona una partida");
+
+            for (Partida partida : partidasCombo) {
+
+                Juego juego = GestionJuegos.buscar(partida.getIdJuego());
+                String nombre = juego == null ? "Juego sin nombre" : juego.getNombre();
+
+                ComboPartidas.addItem(partida.getId() + " - " + nombre + " - " + partida.getFecha() + " " + partida.getHora());
+            }
+
+            ComboPartidas.setSelectedIndex(0);
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(this, "Error al cargar partidas: " + e.getMessage());
+        }
+    }
+
+
+    // CARGAR SOCIOS EN EL COMBOBOX
+    private void cargarSocios() {
+
+        try {
+
+            sociosCombo = GestionSocios.listar();
+
+            ComboSocios.removeAllItems();
+            ComboSocios.addItem("Selecciona un socio");
+
+            for (Socio socio : sociosCombo) {
+
+                ComboSocios.addItem(socio.getNombre() + " " + socio.getApellidos() + " - " + socio.getDocumento());
+            }
+
+            ComboSocios.setSelectedIndex(0);
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(this, "Error al cargar socios: " + e.getMessage());
+        }
+    }
+
+
+    // VOLVER A MOSTRAR LA PARTIDA TRAS AÑADIR O CAMBIAR DATOS
+    private void mostrarPartidaDespuesCambio(int partida) {
+
+        limpiarCampos();
+
+        for (int i = 0; i < partidasCombo.size(); i++) {
+            if (partidasCombo.get(i).getId() == partida) {
+                ComboPartidas.setSelectedIndex(i + 1);
+                return;
+            }
+        }
+
+        // Si la partida no aparece en el ComboBox, usamos el ID
+        IDPartida.setText(String.valueOf(partida));
+        Buscador.setText(String.valueOf(partida));
+        mostrarParticipantes();
+    }
+
+
     // LIMPIAR CAMPOS
     public void limpiarCampos() {
 
@@ -490,5 +632,8 @@ public class VentanaInscripciones extends JFrame {
         Buscador.setText("");
 
         TipoBusquedaInscripciones.setSelectedIndex(0);
+        ComboPartidas.setSelectedIndex(0);
+        ComboSocios.setSelectedIndex(0);
+        PlazasLibresLabel.setText("Plazas libres: -");
     }
 }

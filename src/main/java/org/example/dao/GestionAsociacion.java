@@ -30,7 +30,7 @@ public class GestionAsociacion {
 
         asociacion.validar();
 
-        String sql = "UPDATE asociacion SET razon_social=?, " + "cif=?, direccion=?, telefono=?, email=?, " + "fecha_apertura=? WHERE id=1";
+        String sql = "UPDATE asociacion SET razon_social=?, cif=?, direccion=?, telefono=?, email=?, fecha_apertura=? WHERE id=1";
 
         try (Connection conexion = DatabaseConnection.conectar(); PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 

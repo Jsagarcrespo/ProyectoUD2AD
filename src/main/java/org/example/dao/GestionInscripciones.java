@@ -21,7 +21,7 @@ public class GestionInscripciones {
 
         List<Inscripcion> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM inscripciones " + "WHERE id_partida=? ORDER BY id";
+        String sql = "SELECT * FROM inscripciones WHERE id_partida=? ORDER BY id";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -72,7 +72,7 @@ public class GestionInscripciones {
                 String estado;
 
                 // Bloquear la partida durante la inscripcion
-                String sqlPartida = "SELECT jugadores_deseados, estado " + "FROM partidas WHERE id=? FOR UPDATE";
+                String sqlPartida = "SELECT jugadores_deseados, estado FROM partidas WHERE id=? FOR UPDATE";
 
                 try (PreparedStatement p = c.prepareStatement(sqlPartida)) {
 
@@ -98,7 +98,7 @@ public class GestionInscripciones {
                 // Contar los inscritos
                 int inscritos = 0;
 
-                String sqlContar = "SELECT COUNT(*) FROM inscripciones " + "WHERE id_partida=?";
+                String sqlContar = "SELECT COUNT(*) FROM inscripciones WHERE id_partida=?";
 
                 try (PreparedStatement p = c.prepareStatement(sqlContar)) {
 
@@ -118,7 +118,7 @@ public class GestionInscripciones {
                 }
 
                 // Insertar la inscripcion
-                String sqlInsertar = "INSERT INTO inscripciones " + "(id_partida, documento_socio, " + "nombre_invitado) VALUES (?, ?, ?)";
+                String sqlInsertar = "INSERT INTO inscripciones (id_partida, documento_socio, nombre_invitado) VALUES (?, ?, ?)";
 
                 try (PreparedStatement p = c.prepareStatement(sqlInsertar)) {
 
@@ -188,7 +188,7 @@ public class GestionInscripciones {
     // MOSTRAR PARTICIPANTES DE UNA PARTIDA
     public static String participantes(int idPartida) throws SQLException {
 
-        String sql = "SELECT i.id, " + "COALESCE(CONCAT(s.nombre, ' ', s.apellidos), " + "i.nombre_invitado) AS nombre, " + "i.documento_socio, i.ganador " + "FROM inscripciones i " + "LEFT JOIN socios s " + "ON i.documento_socio=s.documento " + "WHERE i.id_partida=? " + "ORDER BY i.id";
+        String sql = "SELECT i.id, COALESCE(CONCAT(s.nombre, ' ', s.apellidos), i.nombre_invitado) AS nombre, i.documento_socio, i.ganador FROM inscripciones i LEFT JOIN socios s ON i.documento_socio=s.documento WHERE i.id_partida=? " + "ORDER BY i.id";
 
         StringBuilder texto = new StringBuilder();
 
@@ -252,7 +252,7 @@ public class GestionInscripciones {
 
         List<Inscripcion> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM inscripciones " + "WHERE documento_socio=? " + "ORDER BY id_partida";
+        String sql = "SELECT * FROM inscripciones WHERE documento_socio=? ORDER BY id_partida";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -314,7 +314,7 @@ public class GestionInscripciones {
 
         // LEFT JOIN permite consultar nombres de socios
         // y mantiene tambien a los invitados
-        String sql = "SELECT i.* FROM inscripciones i " + "LEFT JOIN socios s " + "ON i.documento_socio=s.documento " + "WHERE " + condicion + " ORDER BY i.id_partida, i.id";
+        String sql = "SELECT i.* FROM inscripciones i LEFT JOIN socios s ON i.documento_socio=s.documento WHERE " + condicion + " ORDER BY i.id_partida, i.id";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 

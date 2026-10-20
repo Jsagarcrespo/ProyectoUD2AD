@@ -59,7 +59,7 @@ public class GestionPartidas {
     // OBTENER EL RANGO DE JUGADORES DE UN JUEGO
     private static int[] rangoJuego(Connection c, int juego) throws SQLException {
 
-        String sql = "SELECT min_jugadores, max_jugadores " + "FROM juegos WHERE id=?";
+        String sql = "SELECT min_jugadores, max_jugadores FROM juegos WHERE id=?";
 
         try (PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -86,7 +86,7 @@ public class GestionPartidas {
 
             partida.validar(rango[0], rango[1]);
 
-            String sql = "INSERT INTO partidas " + "(id_juego, fecha, hora, " + "jugadores_deseados, estado) " + "VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO partidas (id_juego, fecha, hora, jugadores_deseados, estado) VALUES (?, ?, ?, ?, ?)";
 
             try (PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -108,7 +108,7 @@ public class GestionPartidas {
 
                 int juegoActual;
 
-                String consulta = "SELECT id_juego FROM partidas " + "WHERE id=? FOR UPDATE";
+                String consulta = "SELECT id_juego FROM partidas WHERE id=? FOR UPDATE";
 
                 try (PreparedStatement p = c.prepareStatement(consulta)) {
 
@@ -131,7 +131,7 @@ public class GestionPartidas {
                 // No cambiar el juego si hay inscritos
                 if (inscritos > 0 && juegoActual != partida.getIdJuego()) {
 
-                    throw new IllegalArgumentException("No se puede cambiar el juego " + "si hay participantes inscritos.");
+                    throw new IllegalArgumentException("No se puede cambiar el juego si hay participantes inscritos.");
                 }
 
                 int[] rango = rangoJuego(c, partida.getIdJuego());
@@ -143,7 +143,7 @@ public class GestionPartidas {
                     throw new IllegalArgumentException("La partida ya tiene " + inscritos + " participantes.");
                 }
 
-                String sql = "UPDATE partidas SET " + "id_juego=?, fecha=?, hora=?, " + "jugadores_deseados=?, estado=? " + "WHERE id=?";
+                String sql = "UPDATE partidas SET id_juego=?, fecha=?, hora=?, jugadores_deseados=?, estado=? WHERE id=?";
 
                 int filas;
 
@@ -181,7 +181,7 @@ public class GestionPartidas {
     // CANCELAR PARTIDA
     public static boolean cancelar(int id) throws SQLException {
 
-        String sql = "UPDATE partidas SET estado='cancelada' " + "WHERE id=?";
+        String sql = "UPDATE partidas SET estado='cancelada' WHERE id=?";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -209,7 +209,7 @@ public class GestionPartidas {
     // CONTAR LOS INSCRITOS EN UNA PARTIDA
     private static int inscritos(Connection c, int id) throws SQLException {
 
-        String sql = "SELECT COUNT(*) FROM inscripciones " + "WHERE id_partida=?";
+        String sql = "SELECT COUNT(*) FROM inscripciones WHERE id_partida=?";
 
         try (PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -229,7 +229,7 @@ public class GestionPartidas {
 
         try (Connection c = DatabaseConnection.conectar()) {
 
-            String sql = "SELECT jugadores_deseados " + "FROM partidas WHERE id=?";
+            String sql = "SELECT jugadores_deseados FROM partidas WHERE id=?";
 
             try (PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -255,7 +255,7 @@ public class GestionPartidas {
     // LISTADO DE PARTIDAS CON PLAZAS
     public static String listadoConPlazas() throws SQLException {
 
-        String sql = "SELECT p.id, j.nombre, p.fecha, p.hora, " + "p.jugadores_deseados, p.estado, " + "COUNT(i.id) AS inscritos " + "FROM partidas p " + "JOIN juegos j ON p.id_juego=j.id " + "LEFT JOIN inscripciones i " + "ON p.id=i.id_partida " + "GROUP BY p.id, j.nombre, p.fecha, " + "p.hora, p.jugadores_deseados, p.estado " + "ORDER BY p.fecha, p.hora";
+        String sql = "SELECT p.id, j.nombre, p.fecha, p.hora, p.jugadores_deseados, p.estado, COUNT(i.id) AS inscritos FROM partidas p JOIN juegos j ON p.id_juego=j.id LEFT JOIN inscripciones i ON p.id=i.id_partida GROUP BY p.id, j.nombre, p.fecha, p.hora, p.jugadores_deseados, p.estado ORDER BY p.fecha, p.hora";
 
         StringBuilder texto = new StringBuilder();
 
@@ -288,7 +288,7 @@ public class GestionPartidas {
 
         List<Partida> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM partidas " + "WHERE id_juego=? ORDER BY fecha, hora";
+        String sql = "SELECT * FROM partidas WHERE id_juego=? ORDER BY fecha, hora";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -311,7 +311,7 @@ public class GestionPartidas {
 
         List<Partida> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM partidas " + "WHERE fecha=? ORDER BY hora";
+        String sql = "SELECT * FROM partidas WHERE fecha=? ORDER BY hora";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -334,7 +334,7 @@ public class GestionPartidas {
 
         List<Partida> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM partidas " + "WHERE estado=? ORDER BY fecha, hora";
+        String sql = "SELECT * FROM partidas WHERE estado=? ORDER BY fecha, hora";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -355,7 +355,7 @@ public class GestionPartidas {
     // FINALIZAR PARTIDA
     public static boolean finalizar(int id) throws SQLException {
 
-        String sql = "UPDATE partidas SET estado='finalizada' " + "WHERE id=? AND estado='programada'";
+        String sql = "UPDATE partidas SET estado='finalizada' WHERE id=? AND estado='programada'";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
@@ -405,7 +405,7 @@ public class GestionPartidas {
         }
 
         // JOIN para poder buscar por nombre del juego
-        String sql = "SELECT p.* FROM partidas p " + "JOIN juegos j ON p.id_juego=j.id " + "WHERE " + condicion + " ORDER BY p.fecha, p.hora";
+        String sql = "SELECT p.* FROM partidas p JOIN juegos j ON p.id_juego=j.id WHERE " + condicion + " ORDER BY p.fecha, p.hora";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
