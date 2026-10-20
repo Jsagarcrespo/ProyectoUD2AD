@@ -163,7 +163,7 @@ public class VentanaPartidas extends JFrame {
 
                     int inicio = Lista.getLineStartOffset(linea);
                     int fin = Lista.getLineEndOffset(linea);
-
+                    Lista.select(inicio, fin);
                     String texto = Lista.getText(inicio, fin - inicio);
 
                     if (!texto.startsWith("ID: ")) {

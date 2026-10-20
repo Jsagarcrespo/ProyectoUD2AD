@@ -88,6 +88,15 @@ public class VentanaSocios extends JFrame {
         });
 
 
+        // También buscar al pulsar Enter
+        Buscar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buscarSocio();
+            }
+        });
+
+
         // MOSTRAR TODOS
         mostrarTodosButton.addActionListener(new ActionListener() {
             @Override
@@ -142,6 +151,7 @@ public class VentanaSocios extends JFrame {
                     if (!texto.startsWith("Documento: ")) {
                         return;
                     }
+                    textArea1.select(inicio, fin);
 
                     String documento = texto.substring(11, texto.indexOf(" |")).trim();
 
@@ -187,8 +197,41 @@ public class VentanaSocios extends JFrame {
         String nombre = Nombre.getText().trim();
         String apellidos = Apellidos.getText().trim();
         String telefono = Telefono.getText().trim();
-        int edad = Integer.parseInt(Edad.getText().trim());
+        String textoEdad = Edad.getText().trim();
         String email = Email.getText().trim();
+
+        // Comprobar los campos obligatorios antes de guardar
+        if (documento.isEmpty()) {
+            Documento.requestFocusInWindow();
+            throw new IllegalArgumentException("Introduce el documento del socio");
+        }
+
+        if (nombre.isEmpty()) {
+            Nombre.requestFocusInWindow();
+            throw new IllegalArgumentException("Introduce el nombre del socio");
+        }
+
+        if (apellidos.isEmpty()) {
+            Apellidos.requestFocusInWindow();
+            throw new IllegalArgumentException("Introduce los apellidos del socio");
+        }
+
+        if (textoEdad.isEmpty()) {
+            Edad.requestFocusInWindow();
+            throw new IllegalArgumentException("Introduce la edad del socio");
+        }
+
+        if (email.isEmpty()) {
+            Email.requestFocusInWindow();
+            throw new IllegalArgumentException("Introduce el email del socio");
+        }
+
+        if (telefono.isEmpty()) {
+            Telefono.requestFocusInWindow();
+            throw new IllegalArgumentException("Introduce el Telefono del socio");
+        }
+
+        int edad = Integer.parseInt(textoEdad);
 
         Socio socio = new Socio(documento, nombre, apellidos, telefono, edad, email);
 
@@ -200,6 +243,11 @@ public class VentanaSocios extends JFrame {
 
     // AÑADIR SOCIO
     public void anadirSocio() {
+
+        if (!Documento.isEditable()) {
+            JOptionPane.showMessageDialog(this, "Pulsa Limpiar antes de añadir otro socio");
+            return;
+        }
 
         try {
 
@@ -443,5 +491,6 @@ public class VentanaSocios extends JFrame {
 
         // Reiniciar el nuevo ComboBox
         TipoBusquedaSocios.setSelectedIndex(0);
+        Documento.requestFocusInWindow();
     }
 }

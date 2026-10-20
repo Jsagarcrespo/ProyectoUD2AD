@@ -1,6 +1,8 @@
 package org.example;
 
 import org.example.models.Juego;
+import org.example.models.Socio;
+import org.example.dao.GestionSocios;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -19,10 +21,10 @@ public class GestionJuegos extends JFrame {
     private JTextField MinJugadors;
     private JTextField Duracion;
     private JTextField Tematica;
-    private JTextField Tipo;
+    private JComboBox<String> Tipo;
     private JTextField Ubicacion;
-    private JTextField Estado;
-    private JTextField Propietario;
+    private JComboBox<String> Estado;
+    private JComboBox<String> Propietario;
     private JTextField FechaAlta;
 
     private JButton añadirButton;
@@ -42,6 +44,9 @@ public class GestionJuegos extends JFrame {
     private JTextField IdJuego;
     private JPanel GestionJuegos;
 
+    // Socios que mostramos en el desplegable de propietarios
+    private List<Socio> sociosDelCombo = new ArrayList<>();
+
 
     public GestionJuegos() {
 
@@ -55,7 +60,17 @@ public class GestionJuegos extends JFrame {
         Juegos.setEditable(false);
 
         FechaAlta.setText(LocalDate.now().toString());
-        Estado.setText("disponible");
+
+        // Estas listas estan dibujadas en el .form
+        Tipo.setModel(new DefaultComboBoxModel<>(
+                new String[]{"competitivo", "cooperativo", "mixto"}
+        ));
+
+        Estado.setModel(new DefaultComboBoxModel<>(
+                new String[]{"disponible", "prestado", "reparacion"}
+        ));
+
+        cargarSocios();
 
         // Opciones del nuevo buscador
         TipoBusqueda.setModel(new DefaultComboBoxModel<>(new String[]{"Nombre o autor", "Temática", "Número de jugadores", "ID"}));
@@ -132,13 +147,12 @@ public class GestionJuegos extends JFrame {
             public void mouseClicked(MouseEvent e) {
 
                 try {
-
                     int posicion = Juegos.viewToModel2D(e.getPoint());
                     int linea = Juegos.getLineOfOffset(posicion);
 
                     int inicio = Juegos.getLineStartOffset(linea);
                     int fin = Juegos.getLineEndOffset(linea);
-
+                    Juegos.select(inicio, fin);
                     String texto = Juegos.getText(inicio, fin - inicio);
 
                     if (!texto.startsWith("ID: ")) {
@@ -181,13 +195,27 @@ public class GestionJuegos extends JFrame {
 
         Tematica.setText(juego.getTematica() == null ? "" : juego.getTematica());
 
-        Tipo.setText(juego.getTipo());
+        Tipo.setSelectedItem(juego.getTipo());
 
         Ubicacion.setText(juego.getUbicacion() == null ? "" : juego.getUbicacion());
 
-        Estado.setText(juego.getEstado());
+        Estado.setSelectedItem(juego.getEstado());
 
-        Propietario.setText(juego.getDocumentoPropietario() == null ? "" : juego.getDocumentoPropietario());
+        // Mostrar el propietario por nombre, sin escribir su documento
+        Propietario.setSelectedIndex(0);
+
+        if (juego.getDocumentoPropietario() != null) {
+
+            for (int i = 0; i < sociosDelCombo.size(); i++) {
+
+                if (sociosDelCombo.get(i).getDocumento()
+                        .equals(juego.getDocumentoPropietario())) {
+
+                    Propietario.setSelectedIndex(i + 1);
+                    break;
+                }
+            }
+        }
 
         FechaAlta.setText(juego.getFechaAlta().toString());
     }
@@ -207,17 +235,18 @@ public class GestionJuegos extends JFrame {
         int duracion = Integer.parseInt(Duracion.getText().trim());
 
         String tematica = Tematica.getText().trim();
-        String tipo = Tipo.getText().trim().toLowerCase();
+        String tipo = Tipo.getSelectedItem().toString();
         String ubicacion = Ubicacion.getText().trim();
-        String estado = Estado.getText().trim().toLowerCase();
-        String propietario = Propietario.getText().trim();
+        String estado = Estado.getSelectedItem().toString();
+        // Si selecciona Asociacion, se guarda NULL en MariaDB
+        String propietario = null;
+        int posicion = Propietario.getSelectedIndex();
+
+        if (posicion > 0 && posicion <= sociosDelCombo.size()) {
+            propietario = sociosDelCombo.get(posicion - 1).getDocumento();
+        }
 
         LocalDate fecha = LocalDate.parse(FechaAlta.getText().trim());
-
-        // Sin propietario significa que es de la asociacion
-        if (propietario.isEmpty()) {
-            propietario = null;
-        }
 
         Juego juego = new Juego(id, nombre, autores, descripcion, minimo, maximo, duracion, tematica, tipo, ubicacion, estado, propietario, fecha);
 
@@ -468,13 +497,43 @@ public class GestionJuegos extends JFrame {
         MaxJugadores.setText("");
         Duracion.setText("");
         Tematica.setText("");
-        Tipo.setText("");
+        Tipo.setSelectedIndex(0);
         Ubicacion.setText("");
-        Estado.setText("disponible");
-        Propietario.setText("");
+        Estado.setSelectedIndex(0);
+        Propietario.setSelectedIndex(0);
         FechaAlta.setText(LocalDate.now().toString());
         BuscarTextField.setText("");
 
         TipoBusqueda.setSelectedIndex(0);
+    }
+
+
+    // CARGAR SOCIOS EN EL DESPLEGABLE DE PROPIETARIOS
+    public void cargarSocios() {
+
+        try {
+
+            sociosDelCombo = GestionSocios.listar();
+
+            Propietario.removeAllItems();
+            Propietario.addItem("Asociacion (sin propietario)");
+
+            for (Socio socio : sociosDelCombo) {
+
+                Propietario.addItem(
+                        socio.getNombre() + " " + socio.getApellidos()
+                                + " (" + socio.getDocumento() + ")"
+                );
+            }
+
+            Propietario.setSelectedIndex(0);
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error al cargar socios: " + e.getMessage()
+            );
+        }
     }
 }
