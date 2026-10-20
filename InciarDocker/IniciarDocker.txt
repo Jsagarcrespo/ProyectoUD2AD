@@ -1,0 +1,35 @@
+
+## Instalación y ejecución
+
+### Requisitos
+- Java y IntelliJ IDEA
+- Maven
+- Docker Desktop
+
+### 1. Iniciar la base de datos
+
+1. Abrir Docker Desktop.
+2. Entrar en la carpeta `InciarDocker`.
+3. Ejecutar `Iniciar.bat`.
+4. Esperar a que MariaDB termine de arrancar.
+
+El archivo utiliza Docker Compose para iniciar MariaDB 11.4.
+
+En una instalación nueva, el archivo
+`asociacion_juegos.sql` permite crear las tablas
+e insertar los datos iniciales automáticamente.
+
+### 2. Ejecutar la aplicación
+
+1. Abrir `ProyectoUD2AD` en IntelliJ IDEA.
+2. Esperar a que Maven descargue las dependencias.
+3. Ejecutar `Main.java`.
+4. Utilizar el menú gráfico para gestionar
+   juegos, socios, partidas e inscripciones.
+
+### 3. Exportaciones
+
+Desde el menú principal se pueden exportar
+los datos a XML y JSON.
+
+Los archivos generados se guardan en `ficheros`.

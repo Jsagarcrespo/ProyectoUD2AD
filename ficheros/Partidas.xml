@@ -1,10 +1,28 @@
-<list>
+<?xml version="1.0" encoding="UTF-8"?>
+<PartidasAsociacion>
   <Partida>
     <id>1</id>
     <idJuego>3</idJuego>
+    <nombreJuego>Catan</nombreJuego>
     <fecha>2026-10-20</fecha>
-    <hora>17:00:00</hora>
+    <hora>17:00</hora>
     <jugadoresDeseados>4</jugadoresDeseados>
+    <plazasLibres>2</plazasLibres>
     <estado>programada</estado>
+    <participantes>
+      <Participante>
+        <idInscripcion>1</idInscripcion>
+        <tipo>socio</tipo>
+        <nombre>Ana Garcia</nombre>
+        <documento>12345678A</documento>
+        <ganador>false</ganador>
+      </Participante>
+      <Participante>
+        <idInscripcion>2</idInscripcion>
+        <tipo>invitado</tipo>
+        <nombre>Pedro Martinez</nombre>
+        <ganador>false</ganador>
+      </Participante>
+    </participantes>
   </Partida>
-</list>
+</PartidasAsociacion>
