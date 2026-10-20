@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.example.VentanaInscripciones">
-  <grid id="27dc6" binding="VentanaInscripciones" layout-manager="GridLayoutManager" row-count="16" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="VentanaInscripciones" layout-manager="GridLayoutManager" row-count="15" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="680" height="471"/>
+      <xy x="20" y="20" width="699" height="464"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -144,7 +144,7 @@
       </component>
       <component id="5a698" class="javax.swing.JButton" binding="QuitarGanador">
         <constraints>
-          <grid row="15" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="14" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Quitar Ganador"/>
@@ -152,7 +152,7 @@
       </component>
       <component id="d2017" class="javax.swing.JButton" binding="limpiarButton" default-binding="true">
         <constraints>
-          <grid row="15" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="14" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Limpiar"/>
@@ -160,7 +160,7 @@
       </component>
       <component id="4ebca" class="javax.swing.JButton" binding="cerrarButton" default-binding="true">
         <constraints>
-          <grid row="15" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="14" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Cerrar"/>
@@ -198,11 +198,6 @@
           <text value=""/>
         </properties>
       </component>
-      <vspacer id="3f36f">
-        <constraints>
-          <grid row="14" column="4" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-        </constraints>
-      </vspacer>
       <component id="46ac4" class="javax.swing.JLabel">
         <constraints>
           <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -215,7 +210,9 @@
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties><text value="Selecciona una partida"/></properties>
+        <properties>
+          <text value="Selecciona una partida"/>
+        </properties>
       </component>
       <component id="partidas_combo" class="javax.swing.JComboBox" binding="ComboPartidas">
         <constraints>
@@ -227,7 +224,9 @@
         <constraints>
           <grid row="4" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties><text value="Selecciona un socio"/></properties>
+        <properties>
+          <text value="Selecciona un socio"/>
+        </properties>
       </component>
       <component id="socios_combo" class="javax.swing.JComboBox" binding="ComboSocios">
         <constraints>
@@ -239,7 +238,9 @@
         <constraints>
           <grid row="7" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties><text value="Plazas libres: -"/></properties>
+        <properties>
+          <text value="Plazas libres: -"/>
+        </properties>
       </component>
     </children>
   </grid>

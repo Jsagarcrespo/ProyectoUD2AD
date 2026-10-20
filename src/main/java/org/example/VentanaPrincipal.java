@@ -36,7 +36,7 @@ public class VentanaPrincipal extends JFrame {
 
         setTitle("Asociacion de Juegos de Mesa");
         setContentPane(VentanaPrincipal);
-        setSize(500, 500);
+        setSize(560, 530);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -180,7 +180,17 @@ public class VentanaPrincipal extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                System.exit(0);
+                // Preguntamos antes de cerrar la aplicacion
+                int respuesta = JOptionPane.showConfirmDialog(
+                        VentanaPrincipal.this,
+                        "¿Quieres salir de la aplicacion?",
+                        "Salir",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (respuesta == JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
             }
         });
 
