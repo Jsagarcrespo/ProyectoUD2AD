@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.ArrayList;
 
 public class GestionJuegos extends JFrame {
 
@@ -28,6 +29,10 @@ public class GestionJuegos extends JFrame {
     private JButton eliminarButton;
     private JButton modificarButton;
     private JTextField BuscarTextField;
+
+    // Nuevo JComboBox
+    private JComboBox<String> TipoBusqueda;
+
     private JButton BUSCARButton;
     private JTextArea Juegos;
     private JButton mostrarTodoButton;
@@ -46,19 +51,19 @@ public class GestionJuegos extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // El ID lo crea MariaDB
         IdJuego.setEditable(false);
-
-        // El listado no se puede modificar
         Juegos.setEditable(false);
 
         FechaAlta.setText(LocalDate.now().toString());
         Estado.setText("disponible");
 
+        // Opciones del nuevo buscador
+        TipoBusqueda.setModel(new DefaultComboBoxModel<>(new String[]{"Nombre o autor", "Temática", "Número de jugadores", "ID"}));
+
         mostrarJuegos();
 
 
-        // Listener para añadir
+        // AÑADIR
         añadirButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -67,7 +72,7 @@ public class GestionJuegos extends JFrame {
         });
 
 
-        // Listener para modificar
+        // MODIFICAR
         modificarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -76,7 +81,7 @@ public class GestionJuegos extends JFrame {
         });
 
 
-        // Listener para eliminar
+        // ELIMINAR
         eliminarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -85,7 +90,7 @@ public class GestionJuegos extends JFrame {
         });
 
 
-        // Listener para buscar
+        // BUSCAR
         BUSCARButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -94,7 +99,7 @@ public class GestionJuegos extends JFrame {
         });
 
 
-        // Listener para mostrar todos
+        // MOSTRAR TODOS
         mostrarTodoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -103,7 +108,7 @@ public class GestionJuegos extends JFrame {
         });
 
 
-        // Listener para limpiar
+        // LIMPIAR
         limpiarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -112,7 +117,7 @@ public class GestionJuegos extends JFrame {
         });
 
 
-        // Listener para cerrar
+        // CERRAR
         cerrarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -121,8 +126,7 @@ public class GestionJuegos extends JFrame {
         });
 
 
-        // Selecciona un juego pulsando sobre el listado
-        // Igual que en VentanaLibros de UD1
+        // Seleccionar un juego pulsando sobre el listado
         Juegos.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -130,7 +134,6 @@ public class GestionJuegos extends JFrame {
                 try {
 
                     int posicion = Juegos.viewToModel2D(e.getPoint());
-
                     int linea = Juegos.getLineOfOffset(posicion);
 
                     int inicio = Juegos.getLineStartOffset(linea);
@@ -161,13 +164,11 @@ public class GestionJuegos extends JFrame {
     }
 
 
-    // Rellena los campos con los datos del juego seleccionado
+    // Rellena los campos con el juego seleccionado
     public void rellenarCampos(Juego juego) {
 
         IdJuego.setText(String.valueOf(juego.getId()));
-
         NombreJuego.setText(juego.getNombre());
-
         Autores.setText(juego.getAutores());
 
         Descripcion.setText(juego.getDescripcion() == null ? "" : juego.getDescripcion());
@@ -193,7 +194,6 @@ public class GestionJuegos extends JFrame {
 
 
     // Recoge los datos y crea un objeto Juego
-    // Igual que haciamos con el constructor de Libro
     private Juego leerJuego(int id) {
 
         String nombre = NombreJuego.getText().trim();
@@ -214,7 +214,7 @@ public class GestionJuegos extends JFrame {
 
         LocalDate fecha = LocalDate.parse(FechaAlta.getText().trim());
 
-        // Si no hay propietario, pertenece a la asociacion
+        // Sin propietario significa que es de la asociacion
         if (propietario.isEmpty()) {
             propietario = null;
         }
@@ -227,12 +227,11 @@ public class GestionJuegos extends JFrame {
     }
 
 
-    // Añade un juego a MariaDB
+    // AÑADIR JUEGO
     public void anadirJuego() {
 
         try {
 
-            // El ID es 0 porque lo genera MariaDB
             Juego juego = leerJuego(0);
 
             org.example.dao.GestionJuegos.anadir(juego);
@@ -261,7 +260,7 @@ public class GestionJuegos extends JFrame {
     }
 
 
-    // Modifica un juego existente
+    // MODIFICAR JUEGO
     public void modificarJuego() {
 
         try {
@@ -307,7 +306,7 @@ public class GestionJuegos extends JFrame {
     }
 
 
-    // Elimina un juego despues de pedir confirmacion
+    // ELIMINAR JUEGO
     public void eliminarJuego() {
 
         try {
@@ -348,10 +347,10 @@ public class GestionJuegos extends JFrame {
     }
 
 
-    // Busca juegos por ID, nombre o autores
+    // BUSQUEDA AVANZADA - NUEVO
     public void buscarJuego() {
 
-        String busqueda = BuscarTextField.getText().trim().toLowerCase();
+        String busqueda = BuscarTextField.getText().trim();
 
         if (busqueda.isEmpty()) {
             mostrarJuegos();
@@ -360,21 +359,70 @@ public class GestionJuegos extends JFrame {
 
         try {
 
-            List<Juego> juegos = org.example.dao.GestionJuegos.listar();
+            List<Juego> juegos = new ArrayList<>();
 
+            int opcion = TipoBusqueda.getSelectedIndex();
+
+            if (opcion == 0) {
+
+                // Buscar por nombre o autor
+                juegos = org.example.dao.GestionJuegos.buscarPorNombreOAutor(busqueda);
+
+            } else if (opcion == 1) {
+
+                // Buscar por tematica
+                juegos = org.example.dao.GestionJuegos.buscarPorTematica(busqueda);
+
+            } else if (opcion == 2) {
+
+                // Buscar por numero de jugadores
+                int numero = Integer.parseInt(busqueda);
+
+                if (numero <= 0) {
+
+                    JOptionPane.showMessageDialog(this, "Introduce un numero de jugadores mayor que cero");
+                    return;
+                }
+
+                juegos = org.example.dao.GestionJuegos.buscarPorNumeroJugadores(numero);
+
+            } else if (opcion == 3) {
+
+                // Buscar por ID exacto
+                int id = Integer.parseInt(busqueda);
+
+                if (id <= 0) {
+
+                    JOptionPane.showMessageDialog(this, "Introduce un ID mayor que cero");
+                    return;
+                }
+
+                Juego juego = org.example.dao.GestionJuegos.buscar(id);
+
+                if (juego != null) {
+                    juegos.add(juego);
+                }
+            }
+
+
+            // Mostrar resultados
             Juegos.setText("");
 
             for (Juego juego : juegos) {
 
-                if (String.valueOf(juego.getId()).equals(busqueda) || juego.getNombre().toLowerCase().contains(busqueda) || juego.getAutores().toLowerCase().contains(busqueda)) {
+                String tematica = juego.getTematica() == null ? "Sin tematica" : juego.getTematica();
 
-                    Juegos.append("ID: " + juego.getId() + " | Nombre: " + juego.getNombre() + " | Autores: " + juego.getAutores() + " | Estado: " + juego.getEstado() + "\n");
-                }
+                Juegos.append("ID: " + juego.getId() + " | Nombre: " + juego.getNombre() + " | Autores: " + juego.getAutores() + " | Tematica: " + tematica + " | Jugadores: " + juego.getMinJugadores() + "-" + juego.getMaxJugadores() + " | Estado: " + juego.getEstado() + "\n");
             }
 
-            if (Juegos.getText().isEmpty()) {
+            if (juegos.isEmpty()) {
+
                 Juegos.setText("No se han encontrado juegos");
             }
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(this, "Introduce un numero entero valido en la busqueda");
 
         } catch (SQLException e) {
 
@@ -383,7 +431,7 @@ public class GestionJuegos extends JFrame {
     }
 
 
-    // Muestra todos los juegos guardados en MariaDB
+    // MOSTRAR TODOS LOS JUEGOS
     public void mostrarJuegos() {
 
         try {
@@ -398,6 +446,7 @@ public class GestionJuegos extends JFrame {
             }
 
             if (juegos.isEmpty()) {
+
                 Juegos.setText("No hay juegos guardados");
             }
 
@@ -408,7 +457,7 @@ public class GestionJuegos extends JFrame {
     }
 
 
-    // Limpia todos los campos
+    // LIMPIAR CAMPOS
     public void limpiarCampos() {
 
         IdJuego.setText("");
@@ -425,5 +474,7 @@ public class GestionJuegos extends JFrame {
         Propietario.setText("");
         FechaAlta.setText(LocalDate.now().toString());
         BuscarTextField.setText("");
+
+        TipoBusqueda.setSelectedIndex(0);
     }
 }

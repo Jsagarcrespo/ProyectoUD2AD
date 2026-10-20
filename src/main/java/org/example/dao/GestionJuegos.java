@@ -17,7 +17,8 @@ public class GestionJuegos {
         return new Juego(r.getInt("id"), r.getString("nombre"), r.getString("autores"), r.getString("descripcion"), r.getInt("min_jugadores"), r.getInt("max_jugadores"), r.getInt("duracion_min"), r.getString("tematica"), r.getString("tipo"), r.getString("ubicacion"), r.getString("estado"), r.getString("documento_propietario"), fecha == null ? null : fecha.toLocalDate());
     }
 
-    // Lista todos los juegos
+
+    // LISTAR TODOS
     public static List<Juego> listar() throws SQLException {
 
         List<Juego> lista = new ArrayList<>();
@@ -34,7 +35,8 @@ public class GestionJuegos {
         return lista;
     }
 
-    // Busca un juego por ID
+
+    // BUSCAR POR ID
     public static Juego buscar(int id) throws SQLException {
 
         String sql = "SELECT * FROM juegos WHERE id=?";
@@ -54,7 +56,8 @@ public class GestionJuegos {
         return null;
     }
 
-    // Añade un juego
+
+    // AÑADIR
     public static void anadir(Juego juego) throws SQLException {
 
         juego.validar();
@@ -68,7 +71,8 @@ public class GestionJuegos {
         }
     }
 
-    // Modifica un juego
+
+    // MODIFICAR
     public static boolean modificar(Juego juego) throws SQLException {
 
         juego.validar();
@@ -77,9 +81,9 @@ public class GestionJuegos {
 
         try (Connection c = DatabaseConnection.conectar()) {
 
-            // Comprueba que el nuevo rango de jugadores
-            // no sea incompatible con las partidas existentes
-            String consulta = "SELECT COUNT(*) FROM partidas " + "WHERE id_juego=? AND estado<>'cancelada' " + "AND (jugadores_deseados<? OR jugadores_deseados>?)";
+            // Comprobar que las partidas existentes
+            // admiten el nuevo numero de jugadores
+            String consulta = "SELECT COUNT(*) FROM partidas " + "WHERE id_juego=? AND estado<>'cancelada' " + "AND (jugadores_deseados<? " + "OR jugadores_deseados>?)";
 
             try (PreparedStatement comprobacion = c.prepareStatement(consulta)) {
 
@@ -90,6 +94,7 @@ public class GestionJuegos {
                 try (ResultSet r = comprobacion.executeQuery()) {
 
                     if (r.next() && r.getInt(1) > 0) {
+
                         throw new IllegalArgumentException("El rango de jugadores no sirve " + "para algunas partidas existentes");
                     }
                 }
@@ -105,7 +110,8 @@ public class GestionJuegos {
         }
     }
 
-    // Coloca los datos en PreparedStatement
+
+    // Colocar datos en PreparedStatement
     private static void ponerCampos(PreparedStatement p, Juego juego) throws SQLException {
 
         p.setString(1, juego.getNombre());
@@ -119,19 +125,20 @@ public class GestionJuegos {
         p.setString(9, juego.getUbicacion());
         p.setString(10, juego.getEstado());
 
-        // NULL significa que pertenece a la asociacion
         if (juego.getDocumentoPropietario() == null || juego.getDocumentoPropietario().isBlank()) {
 
             p.setNull(11, Types.VARCHAR);
 
         } else {
+
             p.setString(11, juego.getDocumentoPropietario());
         }
 
         p.setDate(12, Date.valueOf(juego.getFechaAlta()));
     }
 
-    // Elimina un juego
+
+    // ELIMINAR
     public static boolean eliminar(int id) throws SQLException {
 
         String sql = "DELETE FROM juegos WHERE id=?";
@@ -139,11 +146,13 @@ public class GestionJuegos {
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
             p.setInt(1, id);
+
             return p.executeUpdate() > 0;
         }
     }
 
-    // Muestra los juegos y sus propietarios
+
+    // LISTADO CON PROPIETARIOS
     public static String listadoConPropietarios() throws SQLException {
 
         String sql = "SELECT j.id, j.nombre, j.estado, " + "CASE WHEN s.documento IS NULL " + "THEN 'Asociacion' " + "ELSE CONCAT(s.nombre, ' ', s.apellidos) " + "END AS propietario " + "FROM juegos j " + "LEFT JOIN socios s " + "ON j.documento_propietario=s.documento " + "ORDER BY j.nombre";
@@ -153,6 +162,7 @@ public class GestionJuegos {
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql); ResultSet r = p.executeQuery()) {
 
             while (r.next()) {
+
                 texto.append("ID: ").append(r.getInt("id")).append(" | Juego: ").append(r.getString("nombre")).append(" | Estado: ").append(r.getString("estado")).append(" | Propietario: ").append(r.getString("propietario")).append("\n");
             }
         }
@@ -160,7 +170,8 @@ public class GestionJuegos {
         return texto.toString();
     }
 
-    // Busca por nombre
+
+    // BUSCAR POR NOMBRE
     public static List<Juego> buscarPorNombre(String nombre) throws SQLException {
 
         List<Juego> lista = new ArrayList<>();
@@ -172,6 +183,7 @@ public class GestionJuegos {
             p.setString(1, "%" + nombre.trim() + "%");
 
             try (ResultSet r = p.executeQuery()) {
+
                 while (r.next()) {
                     lista.add(convertir(r));
                 }
@@ -181,7 +193,81 @@ public class GestionJuegos {
         return lista;
     }
 
-    // Busca por estado
+
+    // NUEVO: BUSCAR POR NOMBRE O AUTOR
+    public static List<Juego> buscarPorNombreOAutor(String texto) throws SQLException {
+
+        List<Juego> lista = new ArrayList<>();
+
+        String sql = "SELECT * FROM juegos " + "WHERE nombre LIKE ? OR autores LIKE ? " + "ORDER BY nombre";
+
+        try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
+
+            String busqueda = "%" + texto.trim() + "%";
+
+            p.setString(1, busqueda);
+            p.setString(2, busqueda);
+
+            try (ResultSet r = p.executeQuery()) {
+
+                while (r.next()) {
+                    lista.add(convertir(r));
+                }
+            }
+        }
+
+        return lista;
+    }
+
+
+    // NUEVO: BUSCAR POR TEMATICA
+    public static List<Juego> buscarPorTematica(String tematica) throws SQLException {
+
+        List<Juego> lista = new ArrayList<>();
+
+        String sql = "SELECT * FROM juegos " + "WHERE tematica LIKE ? ORDER BY nombre";
+
+        try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
+
+            p.setString(1, "%" + tematica.trim() + "%");
+
+            try (ResultSet r = p.executeQuery()) {
+
+                while (r.next()) {
+                    lista.add(convertir(r));
+                }
+            }
+        }
+
+        return lista;
+    }
+
+
+    // NUEVO: BUSCAR POR NUMERO DE JUGADORES
+    public static List<Juego> buscarPorNumeroJugadores(int jugadores) throws SQLException {
+
+        List<Juego> lista = new ArrayList<>();
+
+        String sql = "SELECT * FROM juegos " + "WHERE min_jugadores <= ? " + "AND max_jugadores >= ? " + "ORDER BY nombre";
+
+        try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
+
+            p.setInt(1, jugadores);
+            p.setInt(2, jugadores);
+
+            try (ResultSet r = p.executeQuery()) {
+
+                while (r.next()) {
+                    lista.add(convertir(r));
+                }
+            }
+        }
+
+        return lista;
+    }
+
+
+    // LISTAR POR ESTADO
     public static List<Juego> listarPorEstado(String estado) throws SQLException {
 
         List<Juego> lista = new ArrayList<>();
@@ -193,6 +279,7 @@ public class GestionJuegos {
             p.setString(1, estado);
 
             try (ResultSet r = p.executeQuery()) {
+
                 while (r.next()) {
                     lista.add(convertir(r));
                 }
@@ -202,7 +289,8 @@ public class GestionJuegos {
         return lista;
     }
 
-    // Lista los juegos de un socio
+
+    // LISTAR JUEGOS DE UN SOCIO
     public static List<Juego> listarPorPropietario(String documento) throws SQLException {
 
         List<Juego> lista = new ArrayList<>();
@@ -214,6 +302,7 @@ public class GestionJuegos {
             p.setString(1, documento);
 
             try (ResultSet r = p.executeQuery()) {
+
                 while (r.next()) {
                     lista.add(convertir(r));
                 }
@@ -223,12 +312,13 @@ public class GestionJuegos {
         return lista;
     }
 
-    // Lista los juegos de la asociacion
+
+    // LISTAR JUEGOS DE LA ASOCIACION
     public static List<Juego> listarDeLaAsociacion() throws SQLException {
 
         List<Juego> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM juegos " + "WHERE documento_propietario IS NULL ORDER BY nombre";
+        String sql = "SELECT * FROM juegos " + "WHERE documento_propietario IS NULL " + "ORDER BY nombre";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql); ResultSet r = p.executeQuery()) {
 
