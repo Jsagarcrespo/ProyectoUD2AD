@@ -62,13 +62,9 @@ public class GestionJuegos extends JFrame {
         FechaAlta.setText(LocalDate.now().toString());
 
         // Estas listas estan dibujadas en el .form
-        Tipo.setModel(new DefaultComboBoxModel<>(
-                new String[]{"competitivo", "cooperativo", "mixto"}
-        ));
+        Tipo.setModel(new DefaultComboBoxModel<>(new String[]{"competitivo", "cooperativo", "mixto"}));
 
-        Estado.setModel(new DefaultComboBoxModel<>(
-                new String[]{"disponible", "prestado", "reparacion"}
-        ));
+        Estado.setModel(new DefaultComboBoxModel<>(new String[]{"disponible", "prestado", "reparacion"}));
 
         cargarSocios();
 
@@ -208,8 +204,7 @@ public class GestionJuegos extends JFrame {
 
             for (int i = 0; i < sociosDelCombo.size(); i++) {
 
-                if (sociosDelCombo.get(i).getDocumento()
-                        .equals(juego.getDocumentoPropietario())) {
+                if (sociosDelCombo.get(i).getDocumento().equals(juego.getDocumentoPropietario())) {
 
                     Propietario.setSelectedIndex(i + 1);
                     break;
@@ -313,7 +308,7 @@ public class GestionJuegos extends JFrame {
 
             } else {
 
-                JOptionPane.showMessageDialog(this, "Juego no encontrado");
+                JOptionPane.showMessageDialog(this, "No se han realizado cambios o el juego no existe");
             }
 
         } catch (NumberFormatException e) {
@@ -371,7 +366,14 @@ public class GestionJuegos extends JFrame {
 
         } catch (SQLException e) {
 
-            JOptionPane.showMessageDialog(this, "No se puede eliminar el juego. " + "Puede tener partidas asociadas.\n" + e.getMessage());
+            if (e.getErrorCode() == 1451) {
+
+                JOptionPane.showMessageDialog(this, "No se puede eliminar el juego porque tiene partidas asociadas");
+
+            } else {
+
+                JOptionPane.showMessageDialog(this, "Error al eliminar juego: " + e.getMessage());
+            }
         }
     }
 
@@ -520,20 +522,14 @@ public class GestionJuegos extends JFrame {
 
             for (Socio socio : sociosDelCombo) {
 
-                Propietario.addItem(
-                        socio.getNombre() + " " + socio.getApellidos()
-                                + " (" + socio.getDocumento() + ")"
-                );
+                Propietario.addItem(socio.getNombre() + " " + socio.getApellidos() + " (" + socio.getDocumento() + ")");
             }
 
             Propietario.setSelectedIndex(0);
 
         } catch (SQLException e) {
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Error al cargar socios: " + e.getMessage()
-            );
+            JOptionPane.showMessageDialog(this, "Error al cargar socios: " + e.getMessage());
         }
     }
 }

@@ -225,7 +225,7 @@ public class GestionJuegos {
 
         List<Juego> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM juegos " + "WHERE tematica LIKE ? ORDER BY nombre";
+        String sql = "SELECT * FROM juegos WHERE tematica LIKE ? ORDER BY nombre";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 

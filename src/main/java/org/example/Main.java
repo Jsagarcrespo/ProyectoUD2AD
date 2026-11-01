@@ -16,7 +16,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-public class Main {
+public class
+Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 

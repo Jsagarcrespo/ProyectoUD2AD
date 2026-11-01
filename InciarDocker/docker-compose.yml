@@ -1,4 +1,3 @@
-
 name: proyectoud2
 
 services:
@@ -16,8 +15,18 @@ services:
       - "3306:3306"
 
     volumes:
-      - datos_juegos:/var/lib/mysql
+      # Volumen nuevo: no borra el volumen anterior datos_juegos.
+      - datos_juegos_completos:/var/lib/mysql
+      # Importa los 16 socios, 20 juegos, 22 partidas y 78 inscripciones
+      # al inicializar el volumen por primera vez.
       - ./asociacion_juegos.sql:/docker-entrypoint-initdb.d/01-asociacion_juegos.sql:ro
 
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
 volumes:
-  datos_juegos:
+  datos_juegos_completos:

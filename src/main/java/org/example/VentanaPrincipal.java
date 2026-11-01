@@ -10,6 +10,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -22,6 +24,7 @@ public class VentanaPrincipal extends JFrame {
     private JButton exportarXMLButton;
     private JButton exportarJSONButton;
     private JButton SALIRButton;
+    private JButton estadisticasButton;
 
     private JPanel VentanaPrincipal;
 
@@ -175,18 +178,55 @@ public class VentanaPrincipal extends JFrame {
         });
 
 
+        // Mostrar y exportar estadisticas de un periodo a XML y JSON.
+        estadisticasButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                String textoDesde = JOptionPane.showInputDialog(
+                        VentanaPrincipal.this, "Fecha desde (AAAA-MM-DD):",
+                        LocalDate.now().withDayOfYear(1).toString());
+                if (textoDesde == null) {
+                    return; // Cancelar
+                }
+
+                String textoHasta = JOptionPane.showInputDialog(
+                        VentanaPrincipal.this, "Fecha hasta (AAAA-MM-DD):",
+                        LocalDate.now().toString());
+                if (textoHasta == null) {
+                    return; // Cancelar
+                }
+
+                try {
+                    LocalDate desde = LocalDate.parse(textoDesde.trim());
+                    LocalDate hasta = LocalDate.parse(textoHasta.trim());
+
+                    String resultado = GestionEstadisticas.exportar(desde, hasta);
+
+                    JTextArea area = new JTextArea(resultado, 17, 55);
+                    area.setEditable(false);
+                    JOptionPane.showMessageDialog(VentanaPrincipal.this,
+                            new JScrollPane(area), "Estadisticas", JOptionPane.INFORMATION_MESSAGE);
+
+                } catch (DateTimeParseException ex) {
+                    JOptionPane.showMessageDialog(VentanaPrincipal.this,
+                            "Fecha incorrecta. Escribe AAAA-MM-DD");
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(VentanaPrincipal.this, ex.getMessage());
+                } catch (SQLException | IOException ex) {
+                    JOptionPane.showMessageDialog(VentanaPrincipal.this,
+                            "Error al generar estadisticas: " + ex.getMessage());
+                }
+            }
+        });
+
         // Cierra la aplicacion
         SALIRButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 // Preguntamos antes de cerrar la aplicacion
-                int respuesta = JOptionPane.showConfirmDialog(
-                        VentanaPrincipal.this,
-                        "¿Quieres salir de la aplicacion?",
-                        "Salir",
-                        JOptionPane.YES_NO_OPTION
-                );
+                int respuesta = JOptionPane.showConfirmDialog(VentanaPrincipal.this, "¿Quieres salir de la aplicacion?", "Salir", JOptionPane.YES_NO_OPTION);
 
                 if (respuesta == JOptionPane.YES_OPTION) {
                     System.exit(0);

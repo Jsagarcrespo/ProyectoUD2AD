@@ -297,7 +297,7 @@ public class VentanaPartidas extends JFrame {
 
             } else {
 
-                JOptionPane.showMessageDialog(this, "Partida no encontrada");
+                JOptionPane.showMessageDialog(this, "No se han realizado cambios o la partida no existe");
             }
 
         } catch (NumberFormatException e) {

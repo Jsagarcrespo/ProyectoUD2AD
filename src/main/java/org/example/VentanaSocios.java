@@ -304,7 +304,7 @@ public class VentanaSocios extends JFrame {
 
             } else {
 
-                JOptionPane.showMessageDialog(this, "Socio no encontrado");
+                JOptionPane.showMessageDialog(this, "No se han realizado cambios o el socio no existe");
             }
 
         } catch (NumberFormatException e) {

@@ -47,7 +47,7 @@ public class VentanaInscripciones extends JFrame {
     // Las listas guardan los objetos que se muestran en los ComboBox
     private List<Partida> partidasCombo = new ArrayList<>();
     private List<Socio> sociosCombo = new ArrayList<>();
-
+    private boolean cambiandoDesdeLista = false;
 
     public VentanaInscripciones() {
 
@@ -73,7 +73,11 @@ public class VentanaInscripciones extends JFrame {
         ComboPartidas.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                // Si el cambio viene de rellenarCampos,
+                // no ejecutamos otra búsqueda.
+                if (cambiandoDesdeLista) {
+                    return;
+                }
                 int posicion = ComboPartidas.getSelectedIndex() - 1;
 
                 IdInscripcion.setText("");
@@ -244,8 +248,18 @@ public class VentanaInscripciones extends JFrame {
 
         // Seleccionar la partida en el desplegable
         for (int i = 0; i < partidasCombo.size(); i++) {
+
             if (partidasCombo.get(i).getId() == inscripcion.getIdPartida()) {
-                ComboPartidas.setSelectedIndex(i + 1);
+
+                // Cambiamos el ComboBox sin ejecutar su búsqueda.
+                cambiandoDesdeLista = true;
+
+                try {
+                    ComboPartidas.setSelectedIndex(i + 1);
+                } finally {
+                    cambiandoDesdeLista = false;
+                }
+
                 break;
             }
         }
@@ -433,7 +447,7 @@ public class VentanaInscripciones extends JFrame {
 
             } else {
 
-                JOptionPane.showMessageDialog(this, "Inscripcion no encontrada");
+                JOptionPane.showMessageDialog(this, "No se han realizado cambios o la inscripcion no existe");
             }
 
         } catch (NumberFormatException e) {

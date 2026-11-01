@@ -188,7 +188,7 @@ public class GestionInscripciones {
     // MOSTRAR PARTICIPANTES DE UNA PARTIDA
     public static String participantes(int idPartida) throws SQLException {
 
-        String sql = "SELECT i.id, COALESCE(CONCAT(s.nombre, ' ', s.apellidos), i.nombre_invitado) AS nombre, i.documento_socio, i.ganador FROM inscripciones i LEFT JOIN socios s ON i.documento_socio=s.documento WHERE i.id_partida=? " + "ORDER BY i.id";
+        String sql = "SELECT i.id, COALESCE(CONCAT(s.nombre, ' ', s.apellidos), i.nombre_invitado) AS nombre, i.documento_socio, i.ganador FROM inscripciones i LEFT JOIN socios s ON i.documento_socio=s.documento WHERE i.id_partida=? ORDER BY i.id";
 
         StringBuilder texto = new StringBuilder();
 

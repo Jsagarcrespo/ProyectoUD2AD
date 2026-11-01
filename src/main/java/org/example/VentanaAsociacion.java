@@ -1,4 +1,3 @@
-
 package org.example;
 
 import org.example.dao.GestionAsociacion;
@@ -87,8 +86,7 @@ public class VentanaAsociacion extends JFrame {
 
                 if (asociacion.getFechaApertura() != null) {
 
-                    Apertura.setText(
-                            asociacion.getFechaApertura().toString());
+                    Apertura.setText(asociacion.getFechaApertura().toString());
 
                 } else {
 
@@ -97,16 +95,12 @@ public class VentanaAsociacion extends JFrame {
 
             } else {
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "No se han encontrado datos de la asociacion");
+                JOptionPane.showMessageDialog(this, "No se han encontrado datos de la asociacion");
             }
 
         } catch (SQLException e) {
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Error al cargar la asociacion: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar la asociacion: " + e.getMessage());
         }
     }
 
@@ -127,9 +121,7 @@ public class VentanaAsociacion extends JFrame {
             // Comprobamos los campos obligatorios
             if (razonSocial.isEmpty() || cif.isEmpty()) {
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "La razon social y el CIF son obligatorios");
+                JOptionPane.showMessageDialog(this, "La razon social y el CIF son obligatorios");
 
                 return;
             }
@@ -146,15 +138,7 @@ public class VentanaAsociacion extends JFrame {
 
             // Creamos el objeto Asociacion
             // El ID siempre es 1
-            Asociacion asociacion = new Asociacion(
-                    1,
-                    razonSocial,
-                    cif,
-                    direccion,
-                    telefono,
-                    email,
-                    fecha
-            );
+            Asociacion asociacion = new Asociacion(1, razonSocial, cif, direccion, telefono, email, fecha);
 
 
             // Validamos los datos
@@ -164,37 +148,26 @@ public class VentanaAsociacion extends JFrame {
             // Modificamos los datos en MariaDB
             if (GestionAsociacion.modificar(asociacion)) {
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Asociacion modificada correctamente");
+                JOptionPane.showMessageDialog(this, "Asociacion modificada correctamente");
 
                 cargarAsociacion();
 
             } else {
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "No se han realizado cambios o "
-                                + "la asociacion no existe");
+                JOptionPane.showMessageDialog(this, "No se han realizado cambios o " + "la asociacion no existe");
             }
 
         } catch (DateTimeParseException e) {
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Fecha incorrecta. Utiliza AAAA-MM-DD");
+            JOptionPane.showMessageDialog(this, "Fecha incorrecta. Utiliza AAAA-MM-DD");
 
         } catch (IllegalArgumentException e) {
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage());
+            JOptionPane.showMessageDialog(this, e.getMessage());
 
         } catch (SQLException e) {
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Error al guardar los cambios: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al guardar los cambios: " + e.getMessage());
         }
     }
 }

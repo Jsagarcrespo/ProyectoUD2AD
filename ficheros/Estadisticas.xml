@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<estadisticas>
+  <fecha_desde>2026-01-01</fecha_desde>
+  <fecha_hasta>2026-11-01</fecha_hasta>
+  <socios_actuales>16</socios_actuales>
+  <juegos_actuales>20</juegos_actuales>
+  <partidas_periodo>19</partidas_periodo>
+  <partidas_finalizadas>13</partidas_finalizadas>
+  <partidas_canceladas>1</partidas_canceladas>
+  <juegos_utilizados_periodo>18</juegos_utilizados_periodo>
+  <participaciones_socios>61</participaciones_socios>
+  <participaciones_invitados>8</participaciones_invitados>
+</estadisticas>
