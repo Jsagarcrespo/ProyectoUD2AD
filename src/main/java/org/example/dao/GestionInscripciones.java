@@ -173,7 +173,8 @@ public class GestionInscripciones {
     // MARCAR O DESMARCAR GANADOR
     public static boolean marcarGanador(int id, boolean ganador) throws SQLException {
 
-        String sql = "UPDATE inscripciones SET ganador=? WHERE id=?";
+
+        String sql = "UPDATE inscripciones i JOIN partidas p ON i.id_partida = p.id SET i.ganador=? WHERE i.id=? AND p.estado='finalizada'";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 

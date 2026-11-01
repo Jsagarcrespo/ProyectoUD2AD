@@ -447,7 +447,7 @@ public class VentanaInscripciones extends JFrame {
 
             } else {
 
-                JOptionPane.showMessageDialog(this, "No se han realizado cambios o la inscripcion no existe");
+                JOptionPane.showMessageDialog(this, "No se ha modificado el ganador. Comprueba que la partida este finalizada y la inscripcion exista.");
             }
 
         } catch (NumberFormatException e) {
@@ -463,6 +463,12 @@ public class VentanaInscripciones extends JFrame {
 
     // NUEVO: BUSQUEDA AVANZADA DE INSCRIPCIONES
     public void mostrarParticipantes() {
+
+        // Al hacer otra busqueda, quitamos la inscripcion anterior
+        IdInscripcion.setText("");
+
+        // Quitamos las plazas de la consulta anterior
+        PlazasLibresLabel.setText("Plazas libres: -");
 
         String busqueda = Buscador.getText().trim();
 

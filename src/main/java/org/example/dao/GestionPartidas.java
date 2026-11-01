@@ -107,8 +107,9 @@ public class GestionPartidas {
             try {
 
                 int juegoActual;
+                String estadoActual;
 
-                String consulta = "SELECT id_juego FROM partidas WHERE id=? FOR UPDATE";
+                String consulta = "SELECT id_juego, estado FROM partidas WHERE id=? FOR UPDATE";
 
                 try (PreparedStatement p = c.prepareStatement(consulta)) {
 
@@ -123,11 +124,16 @@ public class GestionPartidas {
                         }
 
                         juegoActual = r.getInt(1);
+                        estadoActual = r.getString("estado");
                     }
                 }
 
-                int inscritos = inscritos(c, partida.getId());
 
+                if (!estadoActual.equals(partida.getEstado())) {
+                    throw new IllegalArgumentException("Para cambiar el estado utiliza Finalizar o Cancelar");
+                }
+
+                int inscritos = inscritos(c, partida.getId());
                 // No cambiar el juego si hay inscritos
                 if (inscritos > 0 && juegoActual != partida.getIdJuego()) {
 
@@ -181,7 +187,7 @@ public class GestionPartidas {
     // CANCELAR PARTIDA
     public static boolean cancelar(int id) throws SQLException {
 
-        String sql = "UPDATE partidas SET estado='cancelada' WHERE id=?";
+        String sql = "UPDATE partidas SET estado='cancelada' WHERE id=? AND estado='programada'";
 
         try (Connection c = DatabaseConnection.conectar(); PreparedStatement p = c.prepareStatement(sql)) {
 
